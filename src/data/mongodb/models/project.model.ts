@@ -1,5 +1,5 @@
 import mongoose, { PopulatedDoc, Schema } from "mongoose";
-import { ITask } from "./task";
+import { ITask } from "./task.model";
 
 export interface IProject extends Document {
   projectName: string;
