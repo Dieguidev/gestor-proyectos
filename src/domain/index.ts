@@ -7,6 +7,7 @@ export * from './dtos/auth/login-user.dto';
 export * from './dtos/auth/update-user.dto';
 export * from './dtos/auth/getAndDelete-user.dto';
 export * from './dtos/project/create-project.dto';
+export * from './dtos/shared/pagination.dto';
 
 
 export * from './entities/user.entity';

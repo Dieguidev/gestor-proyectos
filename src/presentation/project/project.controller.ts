@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CreateProject, CreateProjectDto, CustomError, GetAllProjects, ProjectRepository } from "../../domain";
+import { CreateProject, CreateProjectDto, CustomError, GetAllProjects, PaginationDto, ProjectRepository } from "../../domain";
 
 
 
@@ -32,8 +32,12 @@ export class ProjectController {
 
 
   getAllProjects = (req: Request, res: Response) => {
+    const { page = 1, limit = 10  } = req.query
+    const [error, paginationDto] = PaginationDto.create(+page, +limit)
+    if (error) return res.status(400).json({ error })
+
     new GetAllProjects(this.projectRepository)
-      .execute()
+      .execute(paginationDto!)
       .then(projects => res.json(projects))
       .catch(error => this.handleError(error, res));
   }

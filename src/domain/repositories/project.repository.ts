@@ -1,10 +1,11 @@
 
+import { PaginationDto } from "..";
 import { CreateProjectDto } from "../dtos/project/create-project.dto";
-import { ProjectEntity } from "../entities/project.entity";
+import { ProjectEntity, ProjectsEntitiesWithPagination } from "../entities/project.entity";
 
 
 export abstract class ProjectRepository {
   abstract createProject(createProjectDto: CreateProjectDto): Promise<ProjectEntity>
 
-  abstract getAllProjects(): Promise<ProjectEntity[]>
+  abstract getAllProjects(paginationDto: PaginationDto): Promise<ProjectsEntitiesWithPagination>
 }

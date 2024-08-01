@@ -7,3 +7,16 @@ export class ProjectEntity {
   ) {}
 
 }
+
+
+export class ProjectsEntitiesWithPagination {
+  constructor(
+    public page: number,
+    public limit: number,
+    public total: number,
+    public next: string | null,
+    public prev: string | null,
+    public projects: ProjectEntity[],
+  ) {}
+
+}

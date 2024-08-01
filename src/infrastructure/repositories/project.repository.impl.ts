@@ -1,4 +1,4 @@
-import { CreateProjectDto, ProjectDataSource, ProjectEntity, ProjectRepository } from "../../domain";
+import { CreateProjectDto, PaginationDto, ProjectDataSource, ProjectEntity, ProjectRepository, ProjectsEntitiesWithPagination } from "../../domain";
 
 
 
@@ -7,8 +7,8 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   constructor(
     private readonly projectDatasource: ProjectDataSource,
   ) {}
-  getAllProjects(): Promise<ProjectEntity[]> {
-    return this.projectDatasource.getAllProjects();
+  getAllProjects(paginationDto: PaginationDto): Promise<ProjectsEntitiesWithPagination> {
+    return this.projectDatasource.getAllProjects(paginationDto);
   }
 
 
