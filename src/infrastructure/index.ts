@@ -10,3 +10,4 @@ export * from './repositories/project.repository.impl'
 
 export * from './mappers/user.mapper'
 export * from './mappers/project.mapper'
+export * from './mappers/task.mapper'

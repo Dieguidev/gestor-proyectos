@@ -11,10 +11,12 @@ export * from './dtos/shared/pagination.dto';
 export * from './dtos/project/getById-project.dto';
 export * from './dtos/project/update-project.dto';
 export * from './dtos/project/delete-project.dto';
+export * from './dtos/task/create-task.dto'
 
 
 export * from './entities/user.entity';
 export * from './entities/project.entity';
+export * from './entities/task.entity';
 
 
 export * from './errors/custom.error';
