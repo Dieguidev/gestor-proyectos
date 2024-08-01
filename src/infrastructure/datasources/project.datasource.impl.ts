@@ -1,10 +1,28 @@
 
 import { ProjectModel } from "../../data/mongodb";
-import { CreateProjectDto, CustomError, PaginationDto, ProjectDataSource, ProjectEntity, ProjectsEntitiesWithPagination } from "../../domain";
+import { CreateProjectDto, CustomError, GetByIdProjectDto, PaginationDto, ProjectDataSource, ProjectEntity, ProjectsEntitiesWithPagination } from "../../domain";
 import { ProjectMapper } from "../mappers/project.mapper";
 
 
 export class ProjectDataSourceImpl implements ProjectDataSource {
+  async getProjectById(getByIdProjectDto: GetByIdProjectDto): Promise<ProjectEntity> {
+    const { id } = getByIdProjectDto;
+    try {
+      const project = await ProjectModel.findById(id);
+      if (!project) {
+        throw CustomError.notFound('Project not found');
+      }
+
+      return ProjectMapper.projectEntityFromObject(project);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
+
+
   async getAllProjects(paginationDto: PaginationDto): Promise<ProjectsEntitiesWithPagination> {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
@@ -18,7 +36,6 @@ export class ProjectDataSourceImpl implements ProjectDataSource {
       ])
 
       const listProjects = projects.map(project => ProjectMapper.projectEntityFromObject(project));
-
 
       return {
         page,

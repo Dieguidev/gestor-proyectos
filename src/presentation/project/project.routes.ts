@@ -15,6 +15,7 @@ export class ProjectRoutes {
 
     router.post('/', controller.createProject)
     router.get('/', controller.getAllProjects)
+    router.get('/:id', controller.getProjectById)
 
     return router;
   }

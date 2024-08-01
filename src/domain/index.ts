@@ -8,6 +8,7 @@ export * from './dtos/auth/update-user.dto';
 export * from './dtos/auth/getAndDelete-user.dto';
 export * from './dtos/project/create-project.dto';
 export * from './dtos/shared/pagination.dto';
+export * from './dtos/project/getById-project.dto';
 
 
 export * from './entities/user.entity';
@@ -32,3 +33,4 @@ export * from './use-cases/auth/delete-user.use-case';
 
 export * from './use-cases/project/create-project.use-case';
 export * from './use-cases/project/get-all-projects.use-case';
+export * from './use-cases/project/getById-porject.use-case';
