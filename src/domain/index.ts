@@ -30,3 +30,4 @@ export * from './use-cases/auth/update-user.use-case';
 export * from './use-cases/auth/delete-user.use-case';
 
 export * from './use-cases/project/create-project.use-case';
+export * from './use-cases/project/get-all-projects.use-case';

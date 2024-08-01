@@ -6,5 +6,5 @@ import { ProjectEntity } from "../entities/project.entity";
 export abstract class ProjectRepository {
   abstract createProject(createProjectDto: CreateProjectDto): Promise<ProjectEntity>
 
-  abstract getAllProjects(): Promise<any>
+  abstract getAllProjects(): Promise<ProjectEntity[]>
 }

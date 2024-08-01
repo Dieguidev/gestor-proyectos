@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CreateProject, CreateProjectDto, CustomError, ProjectRepository } from "../../domain";
+import { CreateProject, CreateProjectDto, CustomError, GetAllProjects, ProjectRepository } from "../../domain";
 
 
 
@@ -32,6 +32,9 @@ export class ProjectController {
 
 
   getAllProjects = (req: Request, res: Response) => {
-    res.send('Get all projects')
+    new GetAllProjects(this.projectRepository)
+      .execute()
+      .then(projects => res.json(projects))
+      .catch(error => this.handleError(error, res));
   }
 }

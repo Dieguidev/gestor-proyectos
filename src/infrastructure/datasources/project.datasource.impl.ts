@@ -5,6 +5,10 @@ import { ProjectMapper } from "../mappers/project.mapper";
 
 
 export class ProjectDataSourceImpl implements ProjectDataSource {
+  async getAllProjects(): Promise<ProjectEntity[]> {
+    const projects = await ProjectModel.find();
+    return projects.map(project => ProjectMapper.projectEntityFromObject(project));
+  }
 
 
   async createProject(creaProjectDto: CreateProjectDto): Promise<ProjectEntity> {
