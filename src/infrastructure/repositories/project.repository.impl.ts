@@ -1,4 +1,4 @@
-import { CreateProjectDto, GetByIdProjectDto, PaginationDto, ProjectDataSource, ProjectEntity, ProjectRepository, ProjectsEntitiesWithPagination } from "../../domain";
+import { CreateProjectDto, DeleteProjectDto, GetByIdProjectDto, PaginationDto, ProjectDataSource, ProjectEntity, ProjectRepository, ProjectsEntitiesWithPagination, UpdateProjectDto } from "../../domain";
 
 
 
@@ -14,11 +14,15 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     return this.projectDatasource.getAllProjects(paginationDto);
   }
 
-
   createProject(createProjectDto: CreateProjectDto): Promise<ProjectEntity> {
     return this.projectDatasource.createProject(createProjectDto);
   }
 
+  updateProject(updateProjectDto: UpdateProjectDto): Promise<ProjectEntity> {
+    return this.projectDatasource.updateProject(updateProjectDto);
+  }
 
-
+  deleteProject(deleteProjectDto: DeleteProjectDto): Promise<ProjectEntity> {
+    return this.projectDatasource.deleteProject(deleteProjectDto);
+  }
 }

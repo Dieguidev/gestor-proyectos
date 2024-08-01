@@ -2,10 +2,13 @@ import { GetByIdProjectDto, ProjectRepository } from "../..";
 
 
 interface Project {
-  id: string;
+  project: {
+    id: string;
   projectName: string;
   clientName: string;
   description: string;
+  }
+
 }
 
 interface GetByIdProjectUseCase {
@@ -22,10 +25,13 @@ export class GetByIdProject implements GetByIdProjectUseCase {
     const project = await this.projectRepository.getProjectById(getByIdProjectDto);
 
     return {
-      id: project.id,
+      project: {
+        id: project.id,
       projectName: project.projectName,
       clientName: project.clientName,
       description: project.description,
+      }
+
     }
   }
 }

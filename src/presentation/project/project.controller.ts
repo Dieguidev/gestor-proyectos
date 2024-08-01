@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CreateProject, CreateProjectDto, CustomError, GetAllProjects, GetByIdProject, GetByIdProjectDto, PaginationDto, ProjectRepository } from "../../domain";
+import { CreateProject, CreateProjectDto, CustomError, DeleteProject, DeleteProjectDto, GetAllProjects, GetByIdProject, GetByIdProjectDto, PaginationDto, ProjectRepository, UpdateProject, UpdateProjectDto } from "../../domain";
 
 
 
@@ -50,6 +50,28 @@ export class ProjectController {
 
     new GetByIdProject(this.projectRepository)
       .execute(getByIdProjectDto!)
+      .then(project => res.json(project))
+      .catch(error => this.handleError(error, res));
+  }
+
+  updateProject = (req: Request, res: Response) => {
+    const { id } = req.params;
+    const [error, updateProjectDto] = UpdateProjectDto.create({id, ...req.body})
+    if (error) return res.status(400).json({ error })
+
+    new UpdateProject(this.projectRepository)
+      .execute(updateProjectDto!)
+      .then(project => res.json(project))
+      .catch(error => this.handleError(error, res));
+  }
+
+  deleteProject = (req: Request, res: Response) => {
+    const { id } = req.params;
+    const [error, deleteProjectDto] = DeleteProjectDto.create({ id })
+    if (error) return res.status(400).json({ error })
+
+    new DeleteProject(this.projectRepository)
+      .execute(deleteProjectDto!)
       .then(project => res.json(project))
       .catch(error => this.handleError(error, res));
   }
