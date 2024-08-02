@@ -12,6 +12,7 @@ export * from './dtos/project/getById-project.dto';
 export * from './dtos/project/update-project.dto';
 export * from './dtos/project/delete-project.dto';
 export * from './dtos/task/create-task.dto'
+export * from './dtos/task/get-task-by-projectId.dto';
 
 
 export * from './entities/user.entity';
