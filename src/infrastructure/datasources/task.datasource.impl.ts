@@ -14,8 +14,8 @@ export class TaskDataSourceImpl implements TaskDataSource {
 
       const task = new TaskModel(createTaskDto);
       project.tasks.push(task.id);
-      await task.save();
-      await project.save();
+
+      await Promise.all([task.save(), project.save()]);
 
       return TaskMapper.taskEntityFromObject(task);
     } catch (error) {

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { TaskController } from "./task.controller";
 import { TaskDataSourceImpl, TaskRepositoryImpl } from "../../infrastructure";
+import { ValidateProjectMiddleware } from "../middlewares/validate-project-exists.middleware";
 
 
 
