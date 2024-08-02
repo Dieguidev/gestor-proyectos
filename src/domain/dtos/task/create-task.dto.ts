@@ -8,13 +8,13 @@ export class CreateTaskDto {
   ) { }
 
   static create(object: { [key: string]: any }): [string?, CreateTaskDto?] {
-    const { taskName, description, projectId } = object;
+    const { name, description, projectId } = object;
 
-    if (!taskName) return ['Missing taskName'];
+    if (!name) return ['Missing name'];
     if (!description) return ['Missing description'];
     if (!projectId) return ['Missing project id'];
     if (!Validators.isMongoID(projectId)) return ['Invalid Id']
 
-    return [undefined, new CreateTaskDto(taskName, description, projectId)]
+    return [undefined, new CreateTaskDto(name, description, projectId)]
   }
 }
