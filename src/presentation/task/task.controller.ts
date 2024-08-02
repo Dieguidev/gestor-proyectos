@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CreateTask, CreateTaskDto, CustomError, TaskRepository } from "../../domain";
+import { CreateTask, CreateTaskDto, CustomError, GetByIdProject, TaskRepository } from "../../domain";
 
 export class TaskController {
 
