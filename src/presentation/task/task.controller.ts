@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CreateTask, CreateTaskDto, CustomError, GetByIdProject, TaskRepository } from "../../domain";
+import { CreateTask, CreateTaskDto, CustomError, GetByIdProject, GetTasksByProjectId, GetTasksByProjectIdDto, TaskRepository } from "../../domain";
 
 export class TaskController {
 
@@ -27,6 +27,17 @@ export class TaskController {
     new CreateTask(this.taskRepository)
       .execute(createTaskDto!)
       .then(task => res.json(task))
+      .catch(error => this.handleError(error, res));
+  }
+
+  getTasksByProjectId = (req: Request, res: Response) => {
+    const { projectId } = req.params;
+    const [error, getTasksByProjectIdDto] = GetTasksByProjectIdDto.create({projectId})
+    if (error) return res.status(400).json({ error })
+
+    new GetTasksByProjectId(this.taskRepository)
+      .execute(getTasksByProjectIdDto!)
+      .then(tasks => res.json(tasks))
       .catch(error => this.handleError(error, res));
   }
 }
