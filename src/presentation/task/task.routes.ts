@@ -14,7 +14,7 @@ export class TaskRoutes {
     const controller = new TaskController(taskRepository);
 
     router.post('/:projectId', controller.createTask);
-    router.get('/:projectId', );
+    router.get('/:projectId', controller.);
 
     return router;
   }

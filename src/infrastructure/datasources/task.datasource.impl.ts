@@ -1,9 +1,27 @@
 import { ProjectModel } from "../../data/mongodb";
 import { TaskModel } from "../../data/mongodb/models/task.model";
-import { CreateTaskDto, CustomError, TaskDataSource, TaskEntity } from "../../domain";
+import { CreateTaskDto, CustomError, GetTasksByProjectIdDto, TaskDataSource, TaskEntity } from "../../domain";
 import { TaskMapper } from "../mappers/task.mapper";
 
 export class TaskDataSourceImpl implements TaskDataSource {
+   async getTasksByProjectId(getTasksByProjectIdDto: GetTasksByProjectIdDto): Promise<TaskEntity[]> {
+    const { projectId } = getTasksByProjectIdDto;
+    try {
+      const project = await ProjectModel.findById(projectId);
+      if (!project) {
+        throw CustomError.notFound('Project not found');
+      }
+
+      const tasks = await TaskModel.find({projectId});
+
+      return tasks.map(task => TaskMapper.taskEntityFromObject(task));
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
   async createTask(createTaskDto: CreateTaskDto): Promise<TaskEntity> {
     const { projectId } = createTaskDto;
     try {

@@ -45,3 +45,4 @@ export * from './use-cases/project/update-project.use-case';
 export * from './use-cases/project/delete-project.use-case';
 
 export * from './use-cases/task/create-task.use-case';
+export * from './use-cases/task/get-tasks-by-projectId.use-case';
