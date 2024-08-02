@@ -4,17 +4,17 @@ export class CreateTaskDto {
   private constructor(
     public name: string,
     public description: string,
-    public project: string,
-  ){}
+    public projectId: string,
+  ) { }
 
   static create(object: { [key: string]: any }): [string?, CreateTaskDto?] {
-    const { taskName, description, project } = object;
+    const { taskName, description, projectId } = object;
 
     if (!taskName) return ['Missing taskName'];
     if (!description) return ['Missing description'];
-    if (!project) return ['Missing project id'];
-    if (!Validators.isMongoID(project)) return ['Invalid Id']
+    if (!projectId) return ['Missing project id'];
+    if (!Validators.isMongoID(projectId)) return ['Invalid Id']
 
-    return [undefined, new CreateTaskDto(taskName, description, project)]
+    return [undefined, new CreateTaskDto(taskName, description, projectId)]
   }
 }

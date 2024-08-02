@@ -28,7 +28,7 @@ const taskSchema = new Schema({
     required: [true, 'Description is required'],
     trim: true
   },
-  project: {
+  projectId: {
     type: Schema.Types.ObjectId,
     ref: 'Project',
     required: [true, 'Project is required']

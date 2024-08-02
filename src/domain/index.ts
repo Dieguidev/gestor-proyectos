@@ -24,10 +24,12 @@ export * from './errors/custom.error';
 
 export * from './datasources/auth.datasource';
 export * from './datasources/project.datasource';
+export * from './datasources/task.datasource';
 
 
 export * from './repositories/auth.repository';
 export * from './repositories/project.repository';
+export * from './repositories/task.repository';
 
 
 export * from './use-cases/auth/register-user.use-case';
