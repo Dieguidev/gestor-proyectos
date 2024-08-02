@@ -12,7 +12,7 @@ export class TaskRoutes {
     const taskRepository = new TaskRepositoryImpl(data);
     const controller = new TaskController(taskRepository);
 
-    router.post('/:projectId',);
+    router.post('/:projectId', controller.createTask);
 
     return router;
   }
