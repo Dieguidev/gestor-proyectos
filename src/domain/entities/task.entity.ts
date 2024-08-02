@@ -5,7 +5,7 @@ export class TaskEntity {
     public id: string,
     public name: string,
     public description: string,
-    public project: string,
+    public projectId: string,
     public status: string,
   ) {}
 }
