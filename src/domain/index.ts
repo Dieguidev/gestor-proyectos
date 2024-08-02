@@ -42,3 +42,5 @@ export * from './use-cases/project/get-all-projects.use-case';
 export * from './use-cases/project/getById-porject.use-case';
 export * from './use-cases/project/update-project.use-case';
 export * from './use-cases/project/delete-project.use-case';
+
+export * from './use-cases/task/create-task.use-case';
