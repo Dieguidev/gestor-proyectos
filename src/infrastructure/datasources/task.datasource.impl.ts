@@ -12,7 +12,8 @@ export class TaskDataSourceImpl implements TaskDataSource {
         throw CustomError.notFound('Project not found');
       }
 
-      const tasks = await TaskModel.find({projectId});
+      const tasks = await TaskModel.find({projectId}).populate('projectId');
+      console.log(tasks);
 
       return tasks.map(task => TaskMapper.taskEntityFromObject(task));
     } catch (error) {
