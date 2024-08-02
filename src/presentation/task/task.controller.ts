@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
-import { CreateTaskDto, CustomError } from "../../domain";
+import { CreateTask, CreateTaskDto, CustomError, TaskRepository } from "../../domain";
 
 export class TaskController {
+
+  constructor(
+    private readonly taskRepository: TaskRepository,
+  ) { }
 
   private handleError = (error: unknown, res: Response) => {
     if (error instanceof CustomError) {
@@ -19,9 +23,9 @@ export class TaskController {
     const [error, createTaskDto] = CreateTaskDto.create({projectId, ...req.body})
     if (error) return res.status(400).json({ error })
 
-    // new CreateTask(this.taskRepository)
-    //   .execute(createTaskDto!)
-    //   .then(task => res.json(task))
-    //   .catch(error => this.handleError(error, res));
+    new CreateTask(this.taskRepository)
+      .execute(createTaskDto!)
+      .then(task => res.json(task))
+      .catch(error => this.handleError(error, res));
   }
 }
