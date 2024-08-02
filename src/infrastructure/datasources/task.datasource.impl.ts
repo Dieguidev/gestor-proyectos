@@ -9,7 +9,7 @@ export class TaskDataSourceImpl implements TaskDataSource {
     try {
       const project = await ProjectModel.findById(projectId);
       if (!project) {
-        throw CustomError.notFound('Task not found');
+        throw CustomError.notFound('Project not found');
       }
 
       const task = new TaskModel(createTaskDto);

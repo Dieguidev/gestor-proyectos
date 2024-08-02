@@ -20,7 +20,8 @@ export class TaskController {
 
   createTask = (req: Request, res: Response) => {
     const { projectId } = req.params;
-    const [error, createTaskDto] = CreateTaskDto.create({projectId, ...req.body})
+    const {name, description}= req.body
+    const [error, createTaskDto] = CreateTaskDto.create( {name, description, projectId})
     if (error) return res.status(400).json({ error })
 
     new CreateTask(this.taskRepository)
