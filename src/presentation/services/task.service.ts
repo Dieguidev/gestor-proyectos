@@ -1,4 +1,4 @@
-import { ProjectModel } from "../../data/mongodb";
+import { IProject, ProjectModel } from "../../data/mongodb";
 import { TaskModel } from "../../data/mongodb/models/task.model";
 import { CreateTaskDto, CustomError, GetTasksByProjectIdDto, ProjectEntity, TaskEntity } from "../../domain";
 
