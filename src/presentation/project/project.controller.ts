@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
-import { CreateProject, CreateProjectDto, CustomError, DeleteProject, DeleteProjectDto, GetAllProjects, GetByIdProject, GetByIdProjectDto, PaginationDto, ProjectRepository, UpdateProject, UpdateProjectDto } from "../../domain";
+import { CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, PaginationDto, UpdateProjectDto } from "../../domain";
+import { ProjectService } from "../services/project.service";
 
 
 
 
 export class ProjectController {
   constructor(
-    private readonly projectRepository: ProjectRepository
+    private readonly projectService: ProjectService
   ) { }
 
   private handleError = (error: unknown, res: Response) => {
@@ -24,8 +25,7 @@ export class ProjectController {
     const [error, cerateProjectDto] = CreateProjectDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
-    new CreateProject(this.projectRepository)
-      .execute(cerateProjectDto!)
+    this.projectService.createProject(cerateProjectDto!)
       .then(project => res.json(project))
       .catch(error => this.handleError(error, res));
   }
@@ -36,8 +36,7 @@ export class ProjectController {
     const [error, paginationDto] = PaginationDto.create(+page, +limit)
     if (error) return res.status(400).json({ error })
 
-    new GetAllProjects(this.projectRepository)
-      .execute(paginationDto!)
+    this.projectService.getAllProjects(paginationDto!)
       .then(projects => res.json(projects))
       .catch(error => this.handleError(error, res));
   }
@@ -48,8 +47,7 @@ export class ProjectController {
     const [error, getByIdProjectDto] = GetByIdProjectDto.create({ id })
     if (error) return res.status(400).json({ error })
 
-    new GetByIdProject(this.projectRepository)
-      .execute(getByIdProjectDto!)
+    this.projectService.getProjectById(getByIdProjectDto!)
       .then(project => res.json(project))
       .catch(error => this.handleError(error, res));
   }
@@ -59,8 +57,7 @@ export class ProjectController {
     const [error, updateProjectDto] = UpdateProjectDto.create({id, ...req.body})
     if (error) return res.status(400).json({ error })
 
-    new UpdateProject(this.projectRepository)
-      .execute(updateProjectDto!)
+    this.projectService.updateProject(updateProjectDto!)
       .then(project => res.json(project))
       .catch(error => this.handleError(error, res));
   }
@@ -70,9 +67,8 @@ export class ProjectController {
     const [error, deleteProjectDto] = DeleteProjectDto.create({ id })
     if (error) return res.status(400).json({ error })
 
-    new DeleteProject(this.projectRepository)
-      .execute(deleteProjectDto!)
-      .then(project => res.json(project))
+    this.projectService.deleteProject(deleteProjectDto!)
+      .then(rpta => res.json(rpta))
       .catch(error => this.handleError(error, res));
   }
 }

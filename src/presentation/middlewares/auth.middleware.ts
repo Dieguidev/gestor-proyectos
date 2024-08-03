@@ -23,7 +23,7 @@ export class AuthMiddleware {
       if (!user) return res.status(401).json({ error: 'Invalid token' });
 
       //todo: validar si el usuario esta activo
-      if (!user.status) return res.status(401).json({ error: 'User is not active' });
+      // if (!user.status) return res.status(401).json({ error: 'User is not active' });
 
       req.body.user = user;
       next();

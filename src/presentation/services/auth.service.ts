@@ -1,10 +1,12 @@
 import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { UserModel } from "../../data/mongodb/models/user.model";
 
-import { CustomError, LoginUserDto, RegisterUserDto, UserEntity } from "../../domain";
+import { CustomError, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
 
 
+type HashFunction = (password: string) => string;
+type ConpareFunction = (password: string, hashed: string) => boolean;
 
 
 
@@ -14,6 +16,8 @@ export class AuthService {
   constructor(
     //DI - Servicio Email
     private readonly emailservice: EmailService,
+    private readonly hashPassword: HashFunction = BcryptAdapter.hash,
+    private readonly comparePassword: ConpareFunction = BcryptAdapter.compare,
   ) { }
 
   async registerUser(registerUserDto: RegisterUserDto) {
@@ -74,6 +78,60 @@ export class AuthService {
     }
   }
 
+  async update(updateUserDto: UpdateUserDto) {
+    const { id, ...rest } = updateUserDto;
+
+    try {
+      if (!id || !rest) {
+        throw CustomError.badRequest('Invalid update data');
+      }
+
+      //1. verificar si el correo existe
+      const existsEmail = await UserModel.findOne({ email: rest.email });
+      if (existsEmail) {
+        throw CustomError.badRequest('User already exists');
+      }
+
+      if (rest.password) {
+        rest.password = this.hashPassword(rest.password);
+      }
+
+      const user = await UserModel.findByIdAndUpdate(id, rest, { new: true });
+
+      const { password, ...userEntity } = UserEntity.fromJson(user!)
+
+      return { user: userEntity }
+
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
+
+
+  async delete(getAndDeleteUserDto: GetAndDeleteUserDto) {
+    const { id } = getAndDeleteUserDto;
+
+    try {
+      //1. verificar si el usuario existe
+      const user = await UserModel.findByIdAndUpdate(id, { status: false }, { new: true });
+      if (!user) {
+        throw CustomError.badRequest('User not exists');
+      }
+
+      //2. mapear la respuesta a nuestra entidad
+      return "User deleted"
+
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
+
 
   //metodo para genrar token--puede ser un caso de uso
   private async generateTokenService(id: string) {
@@ -114,13 +172,13 @@ export class AuthService {
 
 
   // metodo para validar token
-  public async validateEmail(token:string) {
+  public async validateEmail(token: string) {
     const payload = await JwtAdapter.validateToken(token);
     if (!payload) {
       throw CustomError.unauthorized('Invalid token');
     }
 
-    const {email}= payload as {email:string}
+    const { email } = payload as { email: string }
     if (!email) {
       throw CustomError.internalServer('Email not in token');
     };

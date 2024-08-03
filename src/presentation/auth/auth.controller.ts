@@ -1,13 +1,14 @@
 import { Request, Response } from "express"
-import { AuthRepository, CustomError, DeleteUser, GetAndDeleteUserDto, LoginUser, LoginUserDto, RegisterUser, RegisterUserDto, UpdateUser, UpdateUserDto } from "../../domain"
-import { JwtAdapter } from "../../config/jwt";
+import { CustomError, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, UpdateUserDto } from "../../domain"
+
 import { UserModel } from "../../data/mongodb";
+import { AuthService } from "../services/auth.service";
 
 
 
 export class AuthController {
   constructor(
-    private readonly authRepository: AuthRepository,
+    private readonly authService: AuthService
   ) { }
 
 
@@ -26,10 +27,9 @@ export class AuthController {
     const [error, registerUserDto] = RegisterUserDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
-    new RegisterUser(this.authRepository)
-      .execute(registerUserDto!)
-      .then(user => res.json(user))
-      .catch(error => this.handleError(error, res));
+    this.authService.registerUser(registerUserDto!)
+      .then((user) => res.json(user))
+      .catch((error) => this.handleError(error, res));
   }
 
 
@@ -37,10 +37,9 @@ export class AuthController {
     const [error, loginUserDto] = LoginUserDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
-    new LoginUser(this.authRepository)
-      .execute(loginUserDto!)
-      .then(user => res.json(user))
-      .catch(error => this.handleError(error, res));
+    this.authService.loginUser(loginUserDto!)
+      .then((user) => res.json(user))
+      .catch((error) => this.handleError(error, res));
   }
 
 
@@ -50,10 +49,9 @@ export class AuthController {
 
     console.log(updateUserDto);
 
-    new UpdateUser(this.authRepository)
-      .execute(updateUserDto!)
-      .then(user => res.json(user))
-      .catch(error => this.handleError(error, res));
+    this.authService.update(updateUserDto!)
+      .then((user) => res.json(user))
+      .catch((error) => this.handleError(error, res));
   }
 
 
@@ -62,17 +60,16 @@ export class AuthController {
     const [error, getAndDeleteUserDto] = GetAndDeleteUserDto.create({ id })
     if (error) return res.status(400).json({ error })
 
-    new DeleteUser(this.authRepository)
-      .execute(getAndDeleteUserDto!)
-      .then(user => res.json(user))
-      .catch(error => this.handleError(error, res));
+    this.authService.delete(getAndDeleteUserDto!)
+      .then((user) => res.json(user))
+      .catch((error) => this.handleError(error, res));
   }
 
-  getUsers = (req: Request, res: Response) => {
-    UserModel.find()
-      .then(users => res.json({
-        user: req.body.user
-      }))
-      .catch(error => this.handleError(error, res))
-  }
+  // getUsers = (req: Request, res: Response) => {
+  //   UserModel.find()
+  //     .then(users => res.json({
+  //       user: req.body.user
+  //     }))
+  //     .catch(error => this.handleError(error, res))
+  // }
 }

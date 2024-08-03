@@ -1,3 +1,4 @@
+import { CustomError } from "../errors/custom.error";
 
 
 export class TaskEntity {
@@ -8,4 +9,16 @@ export class TaskEntity {
     public projectId: string,
     public status: string,
   ) {}
+
+  static fromJson(object: { [key: string]: any }): TaskEntity {
+    const { id, _id, name, description, projectId, status } = object;
+
+    if (!id && !_id) throw CustomError.badRequest('Missing ID');
+    if (!name) throw CustomError.badRequest('Missing name');
+    if (!description) throw CustomError.badRequest('Missing description');
+    if (!projectId) throw CustomError.badRequest('Missing project ID');
+    if (!status) throw CustomError.badRequest('Missing status');
+
+    return new TaskEntity(id || _id, name, description, projectId, status);
+  }
 }

@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { CreateTask, CreateTaskDto, CustomError, GetByIdProject, GetTasksByProjectId, GetTasksByProjectIdDto, TaskRepository } from "../../domain";
+import { CreateTaskDto, CustomError, GetTasksByProjectIdDto } from "../../domain";
+import { TaskService } from "../services/task.service";
 
 export class TaskController {
 
   constructor(
-    private readonly taskRepository: TaskRepository,
+    private readonly taskService: TaskService
   ) { }
 
   private handleError = (error: unknown, res: Response) => {
@@ -20,24 +21,22 @@ export class TaskController {
 
   createTask = (req: Request, res: Response) => {
     const { projectId } = req.params;
-    const {name, description}= req.body
-    const [error, createTaskDto] = CreateTaskDto.create( {name, description, projectId})
+    const { name, description } = req.body
+    const [error, createTaskDto] = CreateTaskDto.create({ name, description, projectId })
     if (error) return res.status(400).json({ error })
 
-    new CreateTask(this.taskRepository)
-      .execute(createTaskDto!)
-      .then(task => res.json(task))
-      .catch(error => this.handleError(error, res));
+    this.taskService.createTask(createTaskDto!)
+      .then((task) => res.json(task))
+      .catch((error) => this.handleError(error, res));
   }
 
   getTasksByProjectId = (req: Request, res: Response) => {
     const { projectId } = req.params;
-    const [error, getTasksByProjectIdDto] = GetTasksByProjectIdDto.create({projectId})
+    const [error, getTasksByProjectIdDto] = GetTasksByProjectIdDto.create({ projectId })
     if (error) return res.status(400).json({ error })
 
-    new GetTasksByProjectId(this.taskRepository)
-      .execute(getTasksByProjectIdDto!)
-      .then(tasks => res.json(tasks))
-      .catch(error => this.handleError(error, res));
+    this.taskService.getTasksByProjectId(getTasksByProjectIdDto!)
+      .then((tasks) => res.json(tasks))
+      .catch((error) => this.handleError(error, res));
   }
 }
