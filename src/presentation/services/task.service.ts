@@ -29,7 +29,6 @@ export class TaskService {
     const { projectId } = getTasksByProjectIdDto;
     try {
       const tasks = await TaskModel.find({ projectId }).populate('projectId');
-      console.log(tasks);
 
       return tasks.map(task => TaskEntity.fromJson(task));
     } catch (error) {
