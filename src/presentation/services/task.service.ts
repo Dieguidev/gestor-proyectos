@@ -5,7 +5,7 @@ import { CreateTaskDto, CustomError, GetTasksByProjectIdDto, ProjectEntity, Task
 
 
 export class TaskService {
-  async createTask(createTaskDto: CreateTaskDto,project: any) {
+  async createTask(createTaskDto: CreateTaskDto, project: any) {
     const { projectId } = createTaskDto;
     try {
       const task = new TaskModel(createTaskDto);
@@ -28,11 +28,6 @@ export class TaskService {
   async getTasksByProjectId(getTasksByProjectIdDto: GetTasksByProjectIdDto) {
     const { projectId } = getTasksByProjectIdDto;
     try {
-      const project = await ProjectModel.findById(projectId);
-      if (!project) {
-        throw CustomError.notFound('Project not found');
-      }
-
       const tasks = await TaskModel.find({ projectId }).populate('projectId');
       console.log(tasks);
 
