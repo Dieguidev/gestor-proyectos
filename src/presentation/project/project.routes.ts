@@ -1,7 +1,6 @@
 import { Router } from "express";
-import { ProjectController } from "./project.controller";
-import { ProjectDataSourceImpl, ProjectRepositoryImpl } from "../../infrastructure";
 import { ProjectService } from "../services/project.service";
+import { ProjectController } from "./project.controller";
 
 
 

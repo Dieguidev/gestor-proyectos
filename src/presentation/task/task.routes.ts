@@ -1,8 +1,7 @@
 import { Router } from "express";
-import { TaskController } from "./task.controller";
-import { TaskDataSourceImpl, TaskRepositoryImpl } from "../../infrastructure";
 import { ValidateProjectMiddleware } from "../middlewares/validate-project-exists.middleware";
 import { TaskService } from "../services/task.service";
+import { TaskController } from "./task.controller";
 
 
 
@@ -13,8 +12,8 @@ export class TaskRoutes {
     const taskService = new TaskService();
     const controller = new TaskController(taskService);
 
-    router.post('/:projectId', controller.createTask);
-    router.get('/:projectId', controller.getTasksByProjectId);
+    router.post('/:projectId', ValidateProjectMiddleware.validateProjectExists, controller.createTask);
+    router.get('/:projectId', ValidateProjectMiddleware.validateProjectExists, controller.getTasksByProjectId);
 
     return router;
   }

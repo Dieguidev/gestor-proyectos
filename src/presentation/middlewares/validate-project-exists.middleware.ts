@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { ProjectRepositoryImpl } from "../../infrastructure";
 import { ProjectModel } from "../../data/mongodb";
+import { ProjectEntity } from "../../domain";
 
 export class ValidateProjectMiddleware {
 

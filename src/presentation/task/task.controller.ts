@@ -21,11 +21,11 @@ export class TaskController {
 
   createTask = (req: Request, res: Response) => {
     const { projectId } = req.params;
-    const { name, description } = req.body
+    const { name, description, project } = req.body
     const [error, createTaskDto] = CreateTaskDto.create({ name, description, projectId })
     if (error) return res.status(400).json({ error })
 
-    this.taskService.createTask(createTaskDto!)
+    this.taskService.createTask(createTaskDto!, project)
       .then((task) => res.json(task))
       .catch((error) => this.handleError(error, res));
   }

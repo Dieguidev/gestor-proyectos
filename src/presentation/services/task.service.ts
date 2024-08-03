@@ -1,16 +1,13 @@
 import { ProjectModel } from "../../data/mongodb";
 import { TaskModel } from "../../data/mongodb/models/task.model";
-import { CreateTaskDto, CustomError, GetTasksByProjectIdDto, TaskEntity } from "../../domain";
+import { CreateTaskDto, CustomError, GetTasksByProjectIdDto, ProjectEntity, TaskEntity } from "../../domain";
+
+
 
 export class TaskService {
-  async createTask(createTaskDto: CreateTaskDto) {
+  async createTask(createTaskDto: CreateTaskDto,project: any) {
     const { projectId } = createTaskDto;
     try {
-      const project = await ProjectModel.findById(projectId);
-      if (!project) {
-        throw CustomError.notFound('Project not found');
-      }
-
       const task = new TaskModel(createTaskDto);
       project.tasks.push(task.id);
 
