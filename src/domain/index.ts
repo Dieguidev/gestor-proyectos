@@ -6,13 +6,17 @@ export * from './dtos/auth/register-user.dto';
 export * from './dtos/auth/login-user.dto';
 export * from './dtos/auth/update-user.dto';
 export * from './dtos/auth/getAndDelete-user.dto';
+
 export * from './dtos/project/create-project.dto';
-export * from './dtos/shared/pagination.dto';
 export * from './dtos/project/getById-project.dto';
 export * from './dtos/project/update-project.dto';
 export * from './dtos/project/delete-project.dto';
+
+export * from './dtos/shared/pagination.dto';
+
 export * from './dtos/task/create-task.dto'
 export * from './dtos/task/get-task-by-projectId.dto';
+export * from './dtos/task/get-task-by-id.dto';
 
 
 export * from './entities/user.entity';
