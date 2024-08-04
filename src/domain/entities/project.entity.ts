@@ -1,4 +1,7 @@
+import mongoose from "mongoose";
+import { ITask } from "../../data/mongodb/models/task.model";
 import { CustomError } from "../errors/custom.error";
+import { TaskEntity } from "./task.entity";
 
 export class ProjectEntity {
   constructor(
@@ -6,6 +9,7 @@ export class ProjectEntity {
     public projectName: string,
     public clientName: string,
     public description: string,
+    public tasks: (TaskEntity | mongoose.Types.ObjectId)[] = []
   ) { }
 
   static fromJson(object: { [key: string]: any }): ProjectEntity {
@@ -13,18 +17,30 @@ export class ProjectEntity {
       id, _id,
       projectName,
       clientName,
-      description } = object;
+      description,
+      tasks = [] } = object;
 
     if (!id && !_id) throw CustomError.badRequest('Missing ID');
     if (!projectName) throw CustomError.badRequest('Missing projectName');
     if (!clientName) throw CustomError.badRequest('Missing clientName');
     if (!description) throw CustomError.badRequest('Missing description');
 
+    const processedTasks = Array.isArray(tasks) && tasks.length > 0
+      ? tasks.map((task: any) => {
+        if (task && typeof task === 'object' && 'name' in task && 'description' in task && 'projectId' in task && 'status' in task) {
+          return TaskEntity.fromJson(task);
+        }
+
+        return task;
+      })
+      : [];
+
     return new ProjectEntity(
       id || _id,
       projectName,
       clientName,
-      description
+      description,
+      processedTasks
     );
   }
 }

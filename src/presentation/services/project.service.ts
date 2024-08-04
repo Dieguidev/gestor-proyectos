@@ -1,4 +1,4 @@
-import { ProjectModel } from "../../data/mongodb";
+import { IProject, ProjectModel } from "../../data/mongodb";
 import { CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, PaginationDto, ProjectEntity, UpdateProjectDto } from "../../domain";
 
 export class ProjectService {
@@ -33,7 +33,7 @@ export class ProjectService {
           .limit(limit)
       ])
 
-      const listProjects: ProjectEntity[] = projects.map(project => ProjectEntity.fromJson(project));
+      const listProjects: ProjectEntity[] = projects.map((project: IProject) => ProjectEntity.fromJson(project));
 
       return {
         page,
@@ -56,10 +56,13 @@ export class ProjectService {
   async getProjectById(getByIdProjectDto: GetByIdProjectDto){
     const { id } = getByIdProjectDto;
     try {
-      const project = await ProjectModel.findById(id);
+      const project = await ProjectModel.findById(id).populate('tasks').exec();
       if (!project) {
         throw CustomError.notFound('Project not found');
       }
+
+
+
 
       return {project: ProjectEntity.fromJson(project)};
     } catch (error) {
