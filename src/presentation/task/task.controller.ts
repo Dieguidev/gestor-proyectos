@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CreateTaskDto, CustomError, GetTasksByProjectIdDto } from "../../domain";
+import { CreateTaskDto, CustomError, GetTaskByIdDto, GetTasksByProjectIdDto } from "../../domain";
 import { TaskService } from "../services/task.service";
 
 export class TaskController {
@@ -37,6 +37,18 @@ export class TaskController {
 
     this.taskService.getTasksByProjectId(getTasksByProjectIdDto!)
       .then((tasks) => res.json(tasks))
+      .catch((error) => this.handleError(error, res));
+  }
+
+  getTaskById = (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { projectId } = req.params;
+
+    const [error, getTaskByIdDto] = GetTaskByIdDto.create({ id, projectId })
+    if (error) return res.status(400).json({ error })
+
+    this.taskService.getTaskById(getTaskByIdDto!)
+      .then((task) => res.json(task))
       .catch((error) => this.handleError(error, res));
   }
 }

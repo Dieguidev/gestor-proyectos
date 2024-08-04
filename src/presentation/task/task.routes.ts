@@ -14,6 +14,8 @@ export class TaskRoutes {
 
     router.post('/:projectId', ValidateProjectMiddleware.validateProjectExists, controller.createTask);
     router.get('/:projectId', ValidateProjectMiddleware.validateProjectExists, controller.getTasksByProjectId);
+    router.get('/:projectId/task/:id',ValidateProjectMiddleware.validateProjectExists, controller.getTaskById);
+
 
     return router;
   }
