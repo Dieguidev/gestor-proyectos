@@ -12,9 +12,11 @@ export class TaskRoutes {
     const taskService = new TaskService();
     const controller = new TaskController(taskService);
 
-    router.post('/:projectId', ValidateProjectMiddleware.validateProjectExists, controller.createTask);
-    router.get('/:projectId', ValidateProjectMiddleware.validateProjectExists, controller.getTasksByProjectId);
-    router.get('/:projectId/task/:id',ValidateProjectMiddleware.validateProjectExists, controller.getTaskById);
+    router.param('projectId', ValidateProjectMiddleware.validateProjectExists);
+
+    router.post('/:projectId', controller.createTask);
+    router.get('/:projectId', controller.getTasksByProjectId);
+    router.get('/:projectId/task/:id', controller.getTaskById);
 
 
     return router;
