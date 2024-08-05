@@ -1,5 +1,7 @@
 import express, { Router } from 'express'
 import colors from 'colors'
+import cors from 'cors'
+import { corsConfig } from '../config/cors';
 
 interface Options {
   port?: number;
@@ -19,6 +21,8 @@ export class Server {
   }
 
   async start() {
+
+    this.app.use(cors(corsConfig));
 
     //middlewares
     this.app.use(express.json());
