@@ -17,6 +17,7 @@ export class TaskRoutes {
     router.post('/:projectId', controller.createTask);
     router.get('/:projectId', controller.getTasksByProjectId);
     router.get('/:projectId/task/:id', controller.getTaskById);
+    router.put('/:projectId/task/:id', controller.updateTask);
 
 
     return router;

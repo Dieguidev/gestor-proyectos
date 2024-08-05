@@ -1,6 +1,6 @@
 import { IProject, ProjectModel } from "../../data/mongodb";
 import { TaskModel, ITask } from '../../data/mongodb/models/task.model';
-import { CreateTaskDto, CustomError, GetTaskByIdDto, GetTasksByProjectIdDto, ProjectEntity, TaskEntity } from "../../domain";
+import { CreateTaskDto, CustomError, GetTaskByIdDto, GetTasksByProjectIdDto, ProjectEntity, TaskEntity, UpdateTaskDto } from "../../domain";
 
 
 
@@ -59,16 +59,20 @@ export class TaskService {
     }
   }
 
-  async updateTask(getTaskByIdDto: GetTaskByIdDto) {
-    const { id, projectId } = getTaskByIdDto;
+  async updateTask(updateTaskdto: UpdateTaskDto) {
+    const { id, name, description } = updateTaskdto;
     try {
-      const task = await TaskModel.findByIdAndUpdate(id, { ...getTaskByIdDto }, { new: true });
+      if (name === undefined && description === undefined) {
+        throw CustomError.badRequest('No data to update');
+      }
+      const task = await TaskModel.findByIdAndUpdate(id, { name, description }, { new: true });
       if (!task) {
         throw CustomError.notFound('Task not found');
       }
-      if (task.projectId.toString() !== projectId) {
-        throw CustomError.forbidden('You are not allowed to access this task');
-      }
+
+
+
+
       return TaskEntity.fromJson(task);
     }
     catch (error) {
