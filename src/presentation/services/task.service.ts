@@ -1,4 +1,5 @@
-import { IProject, ProjectModel } from "../../data/mongodb";
+import { startSession } from "mongoose";
+
 import { TaskModel, ITask } from '../../data/mongodb/models/task.model';
 import { CreateTaskDto, CustomError, GetTaskByIdDto, GetTasksByProjectIdDto, ProjectEntity, TaskEntity, UpdateTaskDto } from "../../domain";
 
@@ -6,17 +7,23 @@ import { CreateTaskDto, CustomError, GetTaskByIdDto, GetTasksByProjectIdDto, Pro
 
 export class TaskService {
   async createTask(createTaskDto: CreateTaskDto, project: any) {
-    const { projectId } = createTaskDto;
+    const session = await startSession();
+    session.startTransaction();
     try {
       const task = new TaskModel(createTaskDto);
       project.tasks.push(task.id);
 
-      await Promise.all([task.save(), project.save()]);
+      await Promise.all([task.save({ session }), project.save({ session })]);
+
+      await session.commitTransaction();
+      session.endSession();
 
       return {
         task: TaskEntity.fromJson(task)
       };
     } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
       if (error instanceof CustomError) {
         throw error;
       }
@@ -69,9 +76,6 @@ export class TaskService {
       if (!task) {
         throw CustomError.notFound('Task not found');
       }
-
-
-
 
       return TaskEntity.fromJson(task);
     }
