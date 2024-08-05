@@ -40,13 +40,33 @@ export class TaskService {
   }
 
   async getTaskById(getTaskByIdDto: GetTaskByIdDto) {
-    const { id,projectId } = getTaskByIdDto;
+    const { id, projectId } = getTaskByIdDto;
     try {
       const task = await TaskModel.findById(id);
       if (!task) {
         throw CustomError.notFound('Task not found');
       }
-      if (task.projectId.toString() !== projectId){
+      if (task.projectId.toString() !== projectId) {
+        throw CustomError.forbidden('You are not allowed to access this task');
+      }
+      return TaskEntity.fromJson(task);
+    }
+    catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
+
+  async updateTask(getTaskByIdDto: GetTaskByIdDto) {
+    const { id, projectId } = getTaskByIdDto;
+    try {
+      const task = await TaskModel.findByIdAndUpdate(id, { ...getTaskByIdDto }, { new: true });
+      if (!task) {
+        throw CustomError.notFound('Task not found');
+      }
+      if (task.projectId.toString() !== projectId) {
         throw CustomError.forbidden('You are not allowed to access this task');
       }
       return TaskEntity.fromJson(task);
