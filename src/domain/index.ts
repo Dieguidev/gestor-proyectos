@@ -18,6 +18,7 @@ export * from './dtos/task/create-task.dto'
 export * from './dtos/task/get-task-by-projectId.dto';
 export * from './dtos/task/get-task-by-id.dto';
 export * from './dtos/task/update-task.dto';
+export * from './dtos/task/delete-task.dto';
 
 
 export * from './entities/user.entity';

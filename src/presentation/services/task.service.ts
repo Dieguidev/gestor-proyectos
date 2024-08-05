@@ -1,7 +1,8 @@
-import { startSession } from "mongoose";
+import { Document, startSession } from "mongoose";
 
 import { TaskModel, ITask } from '../../data/mongodb/models/task.model';
-import { CreateTaskDto, CustomError, GetTaskByIdDto, GetTasksByProjectIdDto, ProjectEntity, TaskEntity, UpdateTaskDto } from "../../domain";
+import { CreateTaskDto, CustomError, DeleteTaskDto, GetTaskByIdDto, GetTasksByProjectIdDto, ProjectEntity, TaskEntity, UpdateTaskDto } from "../../domain";
+import { IProject } from "../../data/mongodb";
 
 
 
@@ -80,6 +81,40 @@ export class TaskService {
       return TaskEntity.fromJson(task);
     }
     catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
+
+  async deleteTask(deleteTaskDto: DeleteTaskDto, project: any) {
+    const session = await startSession();
+    session.startTransaction();
+    const { id, projectId } = deleteTaskDto;
+    try {
+      const task = await TaskModel.findById(id);
+      if (!task) {
+        throw CustomError.notFound('Task not found');
+      }
+      if (task.projectId.toString() !== projectId) {
+        throw CustomError.forbidden('You are not allowed to access this task');
+      }
+
+      project.tasks = project.tasks.filter((taskId: string) => taskId?.toString() !== id);
+
+      await task.deleteOne({ session });
+      await project.save({ session });
+
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return TaskEntity.fromJson(task);
+    }
+    catch (error) {
+      await session.abortTransaction();
+      session.endSession();
       if (error instanceof CustomError) {
         throw error;
       }
