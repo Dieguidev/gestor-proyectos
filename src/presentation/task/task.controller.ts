@@ -76,4 +76,16 @@ export class TaskController {
       .then(() => res.json({ message: 'Task deleted' }))
       .catch((error) => this.handleError(error, res));
   }
+
+  updateTaskStatus = (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const [error, updateTaskDto] = UpdateTaskDto.create( {id, status })
+    if (error) return res.status(400).json({ error })
+
+    this.taskService.updateTaskStatus(updateTaskDto!)
+      .then((task) => res.json(task))
+      .catch((error) => this.handleError(error, res));
+  }
 }

@@ -121,4 +121,26 @@ export class TaskService {
       throw CustomError.internalServer();
     }
   }
+
+
+  async updateTaskStatus(updateTaskdto: UpdateTaskDto) {
+    const { id, status } = updateTaskdto;
+    try {
+      if (status === undefined ) {
+        throw CustomError.badRequest('No data to update');
+      }
+      const task = await TaskModel.findByIdAndUpdate(id, { status }, { new: true });
+      if (!task) {
+        throw CustomError.notFound('Task not found');
+      }
+
+      return TaskEntity.fromJson(task);
+    }
+    catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
 }

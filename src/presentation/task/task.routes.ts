@@ -19,6 +19,7 @@ export class TaskRoutes {
     router.get('/:projectId/task/:id', controller.getTaskById);
     router.put('/:projectId/task/:id', controller.updateTask);
     router.delete('/:projectId/task/:id', controller.deleteTask);
+    router.post('/:projectId/task/:id/status', controller.updateTaskStatus);
 
 
     return router;
