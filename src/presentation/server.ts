@@ -2,6 +2,7 @@ import express, { Router } from 'express'
 import colors from 'colors'
 import cors from 'cors'
 import { corsConfig } from '../config/cors';
+import morgan from 'morgan';
 
 interface Options {
   port?: number;
@@ -23,6 +24,8 @@ export class Server {
   async start() {
 
     this.app.use(cors(corsConfig));
+
+    this.app.use(morgan('dev'));
 
     //middlewares
     this.app.use(express.json());
