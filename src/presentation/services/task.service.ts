@@ -9,12 +9,14 @@ import { IProject } from "../../data/mongodb";
 export class TaskService {
   async createTask(createTaskDto: CreateTaskDto, project: any) {
     const session = await startSession();
-    session.startTransaction();
     try {
+      session.startTransaction();
       const task = new TaskModel(createTaskDto);
       project.tasks.push(task.id);
 
-      await Promise.all([task.save({ session }), project.save({ session })]);
+      // await Promise.all([task.save({ session }), project.save({ session })]);
+      await task.save({ session });
+      await project.save({ session });
 
       await session.commitTransaction();
       session.endSession();
@@ -25,10 +27,12 @@ export class TaskService {
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
+      console.log(error);
       if (error instanceof CustomError) {
         throw error;
       }
       throw CustomError.internalServer();
+
     }
   }
 
@@ -126,7 +130,7 @@ export class TaskService {
   async updateTaskStatus(updateTaskdto: UpdateTaskDto) {
     const { id, status } = updateTaskdto;
     try {
-      if (status === undefined ) {
+      if (status === undefined) {
         throw CustomError.badRequest('No data to update');
       }
       const task = await TaskModel.findByIdAndUpdate(id, { status }, { new: true });
