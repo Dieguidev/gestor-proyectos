@@ -8,10 +8,12 @@ export class TaskEntity {
     public description: string,
     public projectId: string,
     public status: string,
+    public createdAt: Date,
+    public updatedAt: Date
   ) {}
 
   static fromJson(object: { [key: string]: any }): TaskEntity {
-    const { id, _id, name, description, projectId, status } = object;
+    const { id, _id, name, description, projectId, status, createdAt, updatedAt } = object;
 
     if (!id && !_id) throw CustomError.badRequest('Missing ID');
     if (!name) throw CustomError.badRequest('Missing name');
@@ -19,6 +21,6 @@ export class TaskEntity {
     if (!projectId) throw CustomError.badRequest('Missing project ID');
     if (!status) throw CustomError.badRequest('Missing status');
 
-    return new TaskEntity(id || _id, name, description, projectId, status);
+    return new TaskEntity(id || _id, name, description, projectId, status,createdAt, updatedAt  );
   }
 }
