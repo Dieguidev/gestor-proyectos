@@ -3,7 +3,7 @@ import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
 import { UserModel } from "../../data/mongodb/models/user.model";
 
-import { CustomError, generateSixDigitToken, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
+import { CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
 
 
@@ -42,20 +42,20 @@ export class AuthService {
       sixDigittoken.user = user.id
       await sixDigittoken.save({ session })
 
-
       //enviar correo de verificacion
       await this.sendEmailValidationLink(user.email)
 
       const { password, ...userEntity } = UserEntity.fromJson(user)
 
-      const token = await this.generateTokenService(user.id)
+      // const token = await this.generateTokenService(user.id)
+      await this.sendEmailValidationSixdigitToken({ email: user.email, name: user.name, token: sixDigittoken.token })
 
       await session.commitTransaction();
       session.endSession();
 
       return {
         user: userEntity,
-        token
+        // token
       }
 
     } catch (error) {
@@ -156,6 +156,28 @@ export class AuthService {
       throw CustomError.internalServer('Error generating token')
     }
     return token
+  }
+
+  private async sendEmailValidationSixdigitToken(user: IEmail) {
+    const html = `
+      <h1>Valida tu email</h1>
+      <p>Hola: ${user.name}, has creado tu cuenta, ya casi esta todo listo, solo debes confirmar tu cuenta </p>
+      <p>Visita el siguiente enlace:</p>
+      <a href="">Confirmar cuenta</a>
+      <p>Ingresa el código: <b>${user.token}</b></p>
+      <p>Exte token expira en 10 minutos</p>
+    `;
+
+    const options = {
+      to: user.email,
+      subject: 'Confirma tu cuenta',
+      html,
+    }
+
+    const isSent = await this.emailservice.sendEmail(options);
+    if (!isSent) {
+      throw CustomError.internalServer('Error sending email')
+    }
   }
 
   //este metodo puede ser un caso de uso -- metodo para enviar correo

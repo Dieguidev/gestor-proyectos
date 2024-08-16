@@ -32,5 +32,5 @@ export * from './errors/custom.error';
 export * from './utils/generateSixDigitToken';
 
 
-
+export * from './interfaces/email';
 ;
