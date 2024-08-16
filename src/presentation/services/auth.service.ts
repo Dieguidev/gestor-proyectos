@@ -32,7 +32,7 @@ export class AuthService {
       const user = new UserModel(registerUserDto)
 
       //encriptar contraseña
-      user.password = BcryptAdapter.hash(registerUserDto.password)
+      user.password = this.hashPassword(registerUserDto.password)
       await user.save();
 
       //enviar correo de verificacion
@@ -61,7 +61,7 @@ export class AuthService {
     }
 
     //ismatch ..bcrypt
-    const isMatchPassword = BcryptAdapter.compare(loginUserDto.password, user.password)
+    const isMatchPassword = this.comparePassword(loginUserDto.password, user.password)
     if (!isMatchPassword) {
       throw CustomError.badRequest('Invalid credentials')
     }
