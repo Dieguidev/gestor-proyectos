@@ -31,7 +31,7 @@ export class TaskService {
       if (error instanceof CustomError) {
         throw error;
       }
-      throw CustomError.internalServer();
+      throw CustomError.internalServer(`${error}`);
 
     }
   }

@@ -1,7 +1,9 @@
+import { startSession } from "mongoose";
 import { BcryptAdapter, envs, JwtAdapter } from "../../config";
+import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
 import { UserModel } from "../../data/mongodb/models/user.model";
 
-import { CustomError, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
+import { CustomError, generateSixDigitToken, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
 
 
@@ -26,14 +28,20 @@ export class AuthService {
     if (existUser) {
       throw CustomError.badRequest('User already exist')
     }
-
+    const session = await startSession();
     try {
-
+      session.startTransaction();
       const user = new UserModel(registerUserDto)
 
       //encriptar contraseña
       user.password = this.hashPassword(registerUserDto.password)
-      await user.save();
+      await user.save({ session });
+
+      const sixDigittoken = new SixDigitsTokenModel()
+      sixDigittoken.token = generateSixDigitToken()
+      sixDigittoken.user = user.id
+      await sixDigittoken.save({ session })
+
 
       //enviar correo de verificacion
       await this.sendEmailValidationLink(user.email)
@@ -42,12 +50,20 @@ export class AuthService {
 
       const token = await this.generateTokenService(user.id)
 
+      await session.commitTransaction();
+      session.endSession();
+
       return {
         user: userEntity,
         token
       }
 
     } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      if (error instanceof CustomError) {
+        throw error;
+      }
       throw CustomError.internalServer(`${error}`)
     }
 

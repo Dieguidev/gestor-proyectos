@@ -29,7 +29,7 @@ export * from './entities/task.entity';
 export * from './errors/custom.error';
 
 
-
+export * from './utils/generateSixDigitToken';
 
 
 
