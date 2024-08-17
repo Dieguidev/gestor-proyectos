@@ -320,4 +320,64 @@ export class AuthService {
       throw CustomError.internalServer(`${error}`)
     }
   }
+
+
+  async forgotPassword(requestConfirmationCodeDto: RequestConfirmationCodeDto) {
+
+    const existUser = await UserModel.findOne({ email: requestConfirmationCodeDto.email })
+    if (!existUser) {
+      throw CustomError.badRequest('User not exist')
+    }
+    const session = await startSession();
+    try {
+      session.startTransaction();
+
+      const sixDigittoken = new SixDigitsTokenModel()
+      sixDigittoken.token = generateSixDigitToken()
+      sixDigittoken.user = existUser.id
+      await sixDigittoken.save({ session })
+
+      const { password, ...userEntity } = UserEntity.fromJson(existUser)
+
+      await this.sendEmaiForgotPassword({ email: existUser.email, name: existUser.name, token: sixDigittoken.token })
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return {
+        user: userEntity,
+        // token
+      }
+
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer(`${error}`)
+    }
+  }
+
+  private async sendEmaiForgotPassword(user: IEmail) {
+    const html = `
+      <h1>Valida tu email</h1>
+      <p>Hola: ${user.name}, has solicitado reestablecer tu password.</p>
+      <p>Visita el siguiente enlace:</p>
+      <a href="${envs.FRONTEND_URL}/auth/new-password">Reestablecer Password</a>
+      <p>Ingresa el código: <b>${user.token}</b></p>
+      <p>Exte token expira en 10 minutos</p>
+    `;
+
+    const options = {
+      to: user.email,
+      subject: 'Restablece tu password',
+      html,
+    }
+
+    const isSent = await this.emailservice.sendEmail(options);
+    if (!isSent) {
+      throw CustomError.internalServer('Error sending email')
+    }
+  }
 }

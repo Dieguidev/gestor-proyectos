@@ -34,6 +34,7 @@ export class AuthRoutes {
     router.delete('/:id',[AuthMiddleware.isAdminRoleOrSameUser], controller.deleteUser)
     router.post('/confirm-account', controller.confirmAccount)
     router.post('/request-confirmation-code', controller.requestConfirmationCode)
+    router.post('/forgot-password', controller.forgotPassword)
 
     // router.get('/', [AuthMiddleware.validateJWT], controller.getUsers)
 

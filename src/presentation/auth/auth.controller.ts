@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { ConfirmAccountDto, CustomError, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateUserDto } from "../../domain"
+import { ConfirmAccountDto, CustomError, ForgotPasswordDto, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateUserDto } from "../../domain"
 
 import { UserModel } from "../../data/mongodb";
 import { AuthService } from "../services/auth.service";
@@ -80,6 +80,15 @@ export class AuthController {
     if (error) return res.status(400).json({ error })
 
     this.authService.requestConfirmationCode(requestConfirmationCodeDto!)
+      .then((user) => res.json(user))
+      .catch((error) => this.handleError(error, res));
+  }
+
+  forgotPassword = (req: Request, res: Response) => {
+    const [error, forgotPasswordDto] = ForgotPasswordDto.create(req.body)
+    if (error) return res.status(400).json({ error })
+
+    this.authService.forgotPassword(forgotPasswordDto!)
       .then((user) => res.json(user))
       .catch((error) => this.handleError(error, res));
   }
