@@ -75,6 +75,13 @@ export class AuthService {
     if (!user) {
       throw CustomError.badRequest('User or email invalid')
     }
+
+
+    //ismatch ..bcrypt
+    const isMatchPassword = this.comparePassword(password, user.password)
+    if (!isMatchPassword) {
+      throw CustomError.badRequest('Invalid credentials')
+    }
     if (!user.confirmed) {
       const sixDigitoken = new SixDigitsTokenModel()
       sixDigitoken.token = generateSixDigitToken()
@@ -83,13 +90,6 @@ export class AuthService {
 
       await this.sendEmailValidationSixdigitToken({ email: user.email, name: user.name, token: sixDigitoken.token })
       throw CustomError.badRequest('User not confirmed')
-
-    }
-
-    //ismatch ..bcrypt
-    const isMatchPassword = this.comparePassword(password, user.password)
-    if (!isMatchPassword) {
-      throw CustomError.badRequest('Invalid credentials')
     }
 
     const { password: _, ...userEntity } = UserEntity.fromJson(user)
