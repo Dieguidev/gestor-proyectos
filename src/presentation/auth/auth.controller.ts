@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { ConfirmTokenDto, CustomError, ForgotPasswordDto, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateUserDto } from "../../domain"
+import { ConfirmTokenDto, CustomError, ForgotPasswordDto, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdatePasswordDto, UpdateUserDto } from "../../domain"
 
 import { UserModel } from "../../data/mongodb";
 import { AuthService } from "../services/auth.service";
@@ -99,6 +99,16 @@ export class AuthController {
 
     this.authService.validateTokenFromResetPassword(confirmTokenDto!)
       .then((rpta) => res.json(rpta))
+      .catch((error) => this.handleError(error, res));
+  }
+
+  updatePassword = (req: Request, res: Response) => {
+    const { token } = req.params
+    const [error, updatePasswordDto] = UpdatePasswordDto.create({...req.body, token})
+    if (error) return res.status(400).json({ error })
+
+    this.authService.updatePasswordWithToken(updatePasswordDto!)
+      .then((user) => res.json(user))
       .catch((error) => this.handleError(error, res));
   }
 

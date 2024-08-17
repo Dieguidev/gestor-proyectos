@@ -3,7 +3,7 @@ import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
 import { UserModel } from "../../data/mongodb/models/user.model";
 
-import { ConfirmTokenDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateUserDto, UserEntity } from "../../domain";
+import { ConfirmTokenDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdatePasswordDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
 
 
@@ -392,6 +392,42 @@ export class AuthService {
 
       return 'token valido, Define tu nuevo password'
     } catch (error) {
+      console.log(error);
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer(`${error}`)
+    }
+  }
+
+  public async updatePasswordWithToken(updatePasswordDto: UpdatePasswordDto) {
+    const { token, password } = updatePasswordDto;
+
+    const session = await startSession();
+    try {
+      session.startTransaction();
+      const sixDigitTokenExists = await SixDigitsTokenModel.findOne({
+        token
+      })
+      if (!sixDigitTokenExists) {
+        throw CustomError.badRequest('Invalid token')
+      }
+
+      const user = await UserModel.findById(sixDigitTokenExists.user, { session })
+      if (!user) {
+        throw CustomError.badRequest('User not found')
+      }
+      user!.password = this.hashPassword(password)
+      await user!.save({ session })
+      await sixDigitTokenExists.deleteOne({ session })
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return 'El password se actualizo correctamente'
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
       console.log(error);
       if (error instanceof CustomError) {
         throw error;
