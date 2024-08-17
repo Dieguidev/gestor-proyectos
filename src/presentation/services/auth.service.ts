@@ -43,7 +43,7 @@ export class AuthService {
       await sixDigittoken.save({ session })
 
       //enviar correo de verificacion
-      await this.sendEmailValidationLink(user.email)
+      // await this.sendEmailValidationLink(user.email)
 
       const { password, ...userEntity } = UserEntity.fromJson(user)
 
@@ -66,33 +66,41 @@ export class AuthService {
       }
       throw CustomError.internalServer(`${error}`)
     }
-
   }
 
   async loginUser(loginUserDto: LoginUserDto) {
-    //find one para verificar si existe el usuario
-    const user = await UserModel.findOne({ email: loginUserDto.email })
+    const { email, password } = loginUserDto
+    const user = await UserModel.findOne({ email })
     if (!user) {
       throw CustomError.badRequest('User or email invalid')
     }
+    if (!user.confirmed) {
+      const sixDigitoken = new SixDigitsTokenModel()
+      sixDigitoken.token = generateSixDigitToken()
+      sixDigitoken.user = user.id
+      await sixDigitoken.save()
+
+      await this.sendEmailValidationSixdigitToken({ email: user.email, name: user.name, token: sixDigitoken.token })
+      throw CustomError.badRequest('User not confirmed')
+
+    }
 
     //ismatch ..bcrypt
-    const isMatchPassword = this.comparePassword(loginUserDto.password, user.password)
+    const isMatchPassword = this.comparePassword(password, user.password)
     if (!isMatchPassword) {
       throw CustomError.badRequest('Invalid credentials')
     }
 
-    const { password, ...userEntity } = UserEntity.fromJson(user)
+    const { password: _, ...userEntity } = UserEntity.fromJson(user)
 
     const token = await this.generateTokenService(user.id)
-
-
 
     return {
       user: userEntity,
       token: token
     }
   }
+
 
   async update(updateUserDto: UpdateUserDto) {
     const { id, ...rest } = updateUserDto;
@@ -237,7 +245,7 @@ export class AuthService {
     try {
       session.startTransaction();
       const sixDigitTokenExists = await SixDigitsTokenModel.findOne({
-        token : confirmAccountDto.token
+        token: confirmAccountDto.token
       })
       if (!sixDigitTokenExists) {
         throw CustomError.badRequest('Invalid token')
