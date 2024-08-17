@@ -40,6 +40,7 @@ export class AuthService {
       const sixDigittoken = new SixDigitsTokenModel()
       sixDigittoken.token = generateSixDigitToken()
       sixDigittoken.user = user.id
+      // console.log("Generated token:", sixDigittoken.token);
       await sixDigittoken.save({ session })
 
       //enviar correo de verificacion
@@ -171,7 +172,7 @@ export class AuthService {
       <h1>Valida tu email</h1>
       <p>Hola: ${user.name}, has creado tu cuenta, ya casi esta todo listo, solo debes confirmar tu cuenta </p>
       <p>Visita el siguiente enlace:</p>
-      <a href="">Confirmar cuenta</a>
+      <a href="${envs.FRONTEND_URL}/auth/confirm-account">Confirmar cuenta</a>
       <p>Ingresa el código: <b>${user.token}</b></p>
       <p>Exte token expira en 10 minutos</p>
     `;
