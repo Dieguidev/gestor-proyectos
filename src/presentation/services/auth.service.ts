@@ -3,7 +3,7 @@ import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
 import { UserModel } from "../../data/mongodb/models/user.model";
 
-import { CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
+import { ConfirmAccountDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
 
 
@@ -230,5 +230,39 @@ export class AuthService {
     await user.save();
 
     return true;
+  }
+
+  public async confirmSixDigitToken(confirmAccountDto: ConfirmAccountDto) {
+    const session = await startSession();
+    try {
+      session.startTransaction();
+      const sixDigitTokenExists = await SixDigitsTokenModel.findOne({
+        token : confirmAccountDto.token
+      })
+      if (!sixDigitTokenExists) {
+        throw CustomError.badRequest('Invalid token')
+      }
+
+      const user = await UserModel.findById(sixDigitTokenExists.user)
+      if (!user) {
+        throw CustomError.badRequest('User not found')
+      }
+      user.confirmed = true
+      await user.save({ session })
+      await sixDigitTokenExists.deleteOne({ session })
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return user
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      console.log(error);
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer(`${error}`)
+    }
   }
 }
