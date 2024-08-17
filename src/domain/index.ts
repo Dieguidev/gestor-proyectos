@@ -7,6 +7,7 @@ export * from './dtos/auth/login-user.dto';
 export * from './dtos/auth/update-user.dto';
 export * from './dtos/auth/getAndDelete-user.dto';
 export * from './dtos/auth/confirm-account.dto';
+export * from './dtos/auth/request-confirmation-code.dto'
 
 export * from './dtos/project/create-project.dto';
 export * from './dtos/project/getById-project.dto';

@@ -3,7 +3,7 @@ import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
 import { UserModel } from "../../data/mongodb/models/user.model";
 
-import { ConfirmAccountDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
+import { ConfirmAccountDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
 
 
@@ -268,6 +268,52 @@ export class AuthService {
       await session.abortTransaction();
       session.endSession();
       console.log(error);
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer(`${error}`)
+    }
+  }
+
+
+  async requestConfirmationCode(requestConfirmationCodeDto: RequestConfirmationCodeDto) {
+
+    const existUser = await UserModel.findOne({ email: requestConfirmationCodeDto.email })
+    if (!existUser) {
+      throw CustomError.badRequest('User not exist')
+    }
+    if (existUser.confirmed) {
+      throw CustomError.badRequest('User already confirmed')
+    }
+    const session = await startSession();
+    try {
+      session.startTransaction();
+
+      const sixDigittoken = new SixDigitsTokenModel()
+      sixDigittoken.token = generateSixDigitToken()
+      sixDigittoken.user = existUser.id
+      // console.log("Generated token:", sixDigittoken.token);
+      await sixDigittoken.save({ session })
+
+      //enviar correo de verificacion
+      // await this.sendEmailValidationLink(user.email)
+
+      const { password, ...userEntity } = UserEntity.fromJson(existUser)
+
+      // const token = await this.generateTokenService(user.id)
+      await this.sendEmailValidationSixdigitToken({ email: existUser.email, name: existUser.name, token: sixDigittoken.token })
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return {
+        user: userEntity,
+        // token
+      }
+
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
       if (error instanceof CustomError) {
         throw error;
       }

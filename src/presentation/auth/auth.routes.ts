@@ -33,6 +33,7 @@ export class AuthRoutes {
     router.put('/update', [AuthMiddleware.validateJWT], controller.updateUser)
     router.delete('/:id',[AuthMiddleware.isAdminRoleOrSameUser], controller.deleteUser)
     router.post('/confirm-account', controller.confirmAccount)
+    router.post('/request-confirmation-code', controller.requestConfirmationCode)
 
     // router.get('/', [AuthMiddleware.validateJWT], controller.getUsers)
 

@@ -1,8 +1,9 @@
 import { Request, Response } from "express"
-import { ConfirmAccountDto, CustomError, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, UpdateUserDto } from "../../domain"
+import { ConfirmAccountDto, CustomError, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateUserDto } from "../../domain"
 
 import { UserModel } from "../../data/mongodb";
 import { AuthService } from "../services/auth.service";
+
 
 
 
@@ -72,7 +73,16 @@ export class AuthController {
     this.authService.confirmSixDigitToken(confirmAccountDto!)
       .then((user) => res.json(user))
       .catch((error) => this.handleError(error, res));
-}
+  }
+
+  requestConfirmationCode = (req: Request, res: Response) => {
+    const [error, requestConfirmationCodeDto] = RequestConfirmationCodeDto.create(req.body)
+    if (error) return res.status(400).json({ error })
+
+    this.authService.requestConfirmationCode(requestConfirmationCodeDto!)
+      .then((user) => res.json(user))
+      .catch((error) => this.handleError(error, res));
+  }
 
   // getUsers = (req: Request, res: Response) => {
   //   UserModel.find()
