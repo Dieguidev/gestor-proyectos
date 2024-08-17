@@ -35,6 +35,7 @@ export class AuthRoutes {
     router.post('/confirm-account', controller.confirmAccount)
     router.post('/request-confirmation-code', controller.requestConfirmationCode)
     router.post('/forgot-password', controller.forgotPassword)
+    router.post('/validate-token', controller.validateTokenFromResetPassword)
 
     // router.get('/', [AuthMiddleware.validateJWT], controller.getUsers)
 

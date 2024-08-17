@@ -3,7 +3,7 @@ import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
 import { UserModel } from "../../data/mongodb/models/user.model";
 
-import { ConfirmAccountDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateUserDto, UserEntity } from "../../domain";
+import { ConfirmTokenDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
 
 
@@ -241,12 +241,12 @@ export class AuthService {
     return true;
   }
 
-  public async confirmSixDigitToken(confirmAccountDto: ConfirmAccountDto) {
+  public async confirmSixDigitToken(confirmTokenDto: ConfirmTokenDto) {
     const session = await startSession();
     try {
       session.startTransaction();
       const sixDigitTokenExists = await SixDigitsTokenModel.findOne({
-        token: confirmAccountDto.token
+        token: confirmTokenDto.token
       })
       if (!sixDigitTokenExists) {
         throw CustomError.badRequest('Invalid token')
@@ -378,6 +378,25 @@ export class AuthService {
     const isSent = await this.emailservice.sendEmail(options);
     if (!isSent) {
       throw CustomError.internalServer('Error sending email')
+    }
+  }
+
+  public async validateTokenFromResetPassword(confirmTokenDto: ConfirmTokenDto) {
+    try {
+      const sixDigitTokenExists = await SixDigitsTokenModel.findOne({
+        token: confirmTokenDto.token
+      })
+      if (!sixDigitTokenExists) {
+        throw CustomError.badRequest('Invalid token')
+      }
+
+      return 'token valido, Define tu nuevo password'
+    } catch (error) {
+      console.log(error);
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer(`${error}`)
     }
   }
 }
