@@ -323,24 +323,26 @@ export class AuthService {
 
 
   async forgotPassword(requestConfirmationCodeDto: RequestConfirmationCodeDto) {
+    const session = await startSession();
+    session.startTransaction();
 
     const existUser = await UserModel.findOne({ email: requestConfirmationCodeDto.email })
     if (!existUser) {
       throw CustomError.badRequest('User not exist')
     }
-    const session = await startSession();
     try {
-      session.startTransaction();
 
       const sixDigittoken = new SixDigitsTokenModel()
       sixDigittoken.token = generateSixDigitToken()
       sixDigittoken.user = existUser.id
       await sixDigittoken.save({ session })
 
+
+
       const { password, ...userEntity } = UserEntity.fromJson(existUser)
 
       await this.sendEmaiForgotPassword({ email: existUser.email, name: existUser.name, token: sixDigittoken.token })
-
+      // await new Promise(resolve => setTimeout(resolve, 100));
       await session.commitTransaction();
       session.endSession();
 
@@ -414,7 +416,7 @@ export class AuthService {
         throw CustomError.badRequest('Invalid token')
       }
 
-      const user = await UserModel.findById( sixDigitTokenExists.user)
+      const user = await UserModel.findById(sixDigitTokenExists.user)
       console.log(user);
 
       if (!user) {
