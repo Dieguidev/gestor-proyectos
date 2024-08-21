@@ -277,6 +277,8 @@ export class AuthService {
 
 
   async requestConfirmationCode(requestConfirmationCodeDto: RequestConfirmationCodeDto) {
+    const session = await startSession();
+    session.startTransaction();
 
     const existUser = await UserModel.findOne({ email: requestConfirmationCodeDto.email })
     if (!existUser) {
@@ -285,9 +287,7 @@ export class AuthService {
     if (existUser.confirmed) {
       throw CustomError.badRequest('User already confirmed')
     }
-    const session = await startSession();
     try {
-      session.startTransaction();
 
       const sixDigittoken = new SixDigitsTokenModel()
       sixDigittoken.token = generateSixDigitToken()
