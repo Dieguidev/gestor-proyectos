@@ -409,11 +409,14 @@ export class AuthService {
       const sixDigitTokenExists = await SixDigitsTokenModel.findOne({
         token
       })
+
       if (!sixDigitTokenExists) {
         throw CustomError.badRequest('Invalid token')
       }
 
-      const user = await UserModel.findById(sixDigitTokenExists.user, { session })
+      const user = await UserModel.findById( sixDigitTokenExists.user)
+      console.log(user);
+
       if (!user) {
         throw CustomError.badRequest('User not found')
       }
@@ -424,7 +427,7 @@ export class AuthService {
       await session.commitTransaction();
       session.endSession();
 
-      return 'El password se actualizo correctamente'
+      return 'El password se actualizó correctamente'
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
