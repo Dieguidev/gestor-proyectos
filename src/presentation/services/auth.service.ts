@@ -337,12 +337,10 @@ export class AuthService {
       sixDigittoken.user = existUser.id
       await sixDigittoken.save({ session })
 
-
-
       const { password, ...userEntity } = UserEntity.fromJson(existUser)
 
       await this.sendEmaiForgotPassword({ email: existUser.email, name: existUser.name, token: sixDigittoken.token })
-      // await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 100));
       await session.commitTransaction();
       session.endSession();
 
@@ -404,10 +402,11 @@ export class AuthService {
 
   public async updatePasswordWithToken(updatePasswordDto: UpdatePasswordDto) {
     const { token, password } = updatePasswordDto;
+    console.log(token, password);
 
     const session = await startSession();
+    session.startTransaction();
     try {
-      session.startTransaction();
       const sixDigitTokenExists = await SixDigitsTokenModel.findOne({
         token
       })
