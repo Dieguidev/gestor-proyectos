@@ -16,7 +16,7 @@ const sixDigitsTokenSchema : Schema = new Schema({
     ref: 'User',
     required: true,
   },
-  createdAt: {
+  expiresAt: {
     type: Date,
     default: Date.now(),
     expires: "10m",
