@@ -10,7 +10,7 @@ export class ProjectService {
     // }
 
     try {
-      const project = new ProjectModel({ projectName, clientName, description });
+      const project = new ProjectModel(creaProjectDto);
 
       await project.save();
 
