@@ -1,8 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { JwtAdapter } from "../../config/jwt";
-import { UserModel } from "../../data/mongodb";
+import { IUser, UserModel } from "../../data/mongodb";
 
-
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IUser;
+    }
+  }
+}
 
 export class AuthMiddleware {
 
@@ -19,13 +25,13 @@ export class AuthMiddleware {
       const payload = await JwtAdapter.validateToken<{ id: string }>(token);
       if (!payload) return res.status(401).json({ error: 'Invalid token - user' });
 
-      const user = await UserModel.findById(payload.id);
+      const user = await UserModel.findById(payload.id).select('id name email');
       if (!user) return res.status(401).json({ error: 'Invalid token' });
 
       //todo: validar si el usuario esta activo
       // if (!user.status) return res.status(401).json({ error: 'User is not active' });
 
-      req.body.user = user;
+      req.user = user;
       next();
 
     } catch (error) {
@@ -35,7 +41,7 @@ export class AuthMiddleware {
     }
   }
 
-  static async isAdminRole(req: Request, res: Response, next: NextFunction){
+  static async isAdminRole(req: Request, res: Response, next: NextFunction) {
     if (!req.body.user) {
       return res.status(500).json({
         msg: 'Se quiere verificar el role sin validar el token primero',
@@ -43,7 +49,7 @@ export class AuthMiddleware {
     }
     const user = req.body.user;
 
-    if(user.role[0] !== 'ADMIN_ROLE'){
+    if (user.role[0] !== 'ADMIN_ROLE') {
       return res.status(401).json({
         error: 'User is not admin'
       })
@@ -52,7 +58,7 @@ export class AuthMiddleware {
   }
 
 
-  static async isAdminRoleOrSameUser(req: Request, res: Response, next: NextFunction){
+  static async isAdminRoleOrSameUser(req: Request, res: Response, next: NextFunction) {
     if (!req.body.user) {
       return res.status(500).json({
         msg: 'Se quiere verificar el role sin validar el token primero',
@@ -60,7 +66,7 @@ export class AuthMiddleware {
     }
     const user = req.body.user;
 
-    if(user.role[0] !== 'ADMIN_ROLE' && user.id !== req.params.id){
+    if (user.role[0] !== 'ADMIN_ROLE' && user.id !== req.params.id) {
       return res.status(401).json({
         error: 'User is not admin or same user'
       })
