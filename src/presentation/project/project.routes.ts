@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ProjectService } from "../services/project.service";
 import { ProjectController } from "./project.controller";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
 
 
 
@@ -12,7 +13,7 @@ export class ProjectRoutes {
     const projectService = new ProjectService()
     const controller = new ProjectController(projectService);
 
-    router.post('/', controller.createProject)
+    router.post('/',[AuthMiddleware.validateJWT], controller.createProject)
     router.get('/', controller.getAllProjects)
     router.get('/:id', controller.getProjectById)
     router.put('/:id', controller.updateProject)
