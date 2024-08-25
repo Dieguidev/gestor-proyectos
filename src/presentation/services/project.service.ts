@@ -77,12 +77,16 @@ export class ProjectService {
     }
   }
 
-  async deleteProject(deleteProjectDto: DeleteProjectDto) {
+  async deleteProject(deleteProjectDto: DeleteProjectDto, userId: IUser['_id']) {
     const { id } = deleteProjectDto;
     try {
       const project = await ProjectModel.findByIdAndDelete(id);
       if (!project) {
         throw CustomError.notFound('Project not found');
+      }
+
+      if (project.manager.toString() !== userId.toString()) {
+        throw CustomError.forbidden('Acción no válida');
       }
 
       return 'Project deleted';
@@ -95,7 +99,7 @@ export class ProjectService {
   }
 
 
-  async updateProject(updateProjectDto: UpdateProjectDto) {
+  async updateProject(updateProjectDto: UpdateProjectDto, userId: IUser['_id']) {
     const { id, ...rest } = updateProjectDto
     try {
       if (!id || !rest) {
@@ -105,6 +109,10 @@ export class ProjectService {
 
       if (!project) {
         throw CustomError.notFound('Project not found');
+      }
+
+      if (project.manager.toString() !== userId.toString()) {
+        throw CustomError.forbidden('Acción no válida');
       }
 
       return { project: ProjectEntity.fromJson(project) };

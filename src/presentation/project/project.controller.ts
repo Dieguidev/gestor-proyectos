@@ -57,7 +57,7 @@ export class ProjectController {
     const [error, updateProjectDto] = UpdateProjectDto.create({id, ...req.body})
     if (error) return res.status(400).json({ error })
 
-    this.projectService.updateProject(updateProjectDto!)
+    this.projectService.updateProject(updateProjectDto!, req.user!.id)
       .then(project => res.json(project))
       .catch(error => this.handleError(error, res));
   }
@@ -67,7 +67,7 @@ export class ProjectController {
     const [error, deleteProjectDto] = DeleteProjectDto.create({ id })
     if (error) return res.status(400).json({ error })
 
-    this.projectService.deleteProject(deleteProjectDto!)
+    this.projectService.deleteProject(deleteProjectDto!, req.user!.id)
       .then(rpta => res.json(rpta))
       .catch(error => this.handleError(error, res));
   }
