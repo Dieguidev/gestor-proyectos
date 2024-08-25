@@ -91,7 +91,8 @@ export class ProjectController {
 
 
   removeMemberById = (req: Request, res: Response) => {
-    const [error, addTeamMemberDto] = AddTeamMemberDto.create(req.body)
+    const {userId} = req.params;
+    const [error, addTeamMemberDto] = AddTeamMemberDto.create({userId})
     if (error) return res.status(400).json({ error })
 
     this.projectService.removeMemberById(addTeamMemberDto!, req.project!)
