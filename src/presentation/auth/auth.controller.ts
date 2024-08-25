@@ -114,7 +114,7 @@ export class AuthController {
 
 
   user = (req: Request, res: Response) => {
-    this.authService.user(req.body.user)
+    this.authService.user(req.user!)
       .then((user) => res.json(user))
       .catch((error) => this.handleError(error, res));
   }

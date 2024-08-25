@@ -436,11 +436,9 @@ export class AuthService {
     }
   }
 
-  public async user(user: IUser) {
-    const { password: _, ...userEntity } = UserEntity.fromJson(user)
-
+  public async user(user: unknown) {
     return {
-      userEntity,
+      user,
     }
   }
 }
