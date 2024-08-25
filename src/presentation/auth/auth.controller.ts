@@ -104,12 +104,19 @@ export class AuthController {
 
   updatePassword = (req: Request, res: Response) => {
     const { token } = req.params
-    const [error, updatePasswordDto] = UpdatePasswordDto.create({...req.body, token})
+    const [error, updatePasswordDto] = UpdatePasswordDto.create({ ...req.body, token })
     if (error) return res.status(400).json({ error })
 
     this.authService.updatePasswordWithToken(updatePasswordDto!)
       .then((user) => res.json(user))
       .catch((error) => this.handleError(error, res));
+  }
+
+
+  user = (req: Request, res: Response) => {
+    res.json({
+      user: req.body.user
+    })
   }
 
   // getUsers = (req: Request, res: Response) => {

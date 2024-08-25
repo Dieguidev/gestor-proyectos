@@ -37,6 +37,7 @@ export class AuthRoutes {
     router.post('/forgot-password', controller.forgotPassword)
     router.post('/validate-token', controller.validateTokenFromResetPassword)
     router.put('/update-password/:token', controller.updatePassword)
+    router.get('/user', [AuthMiddleware.validateJWT], controller.user)
 
     // router.get('/', [AuthMiddleware.validateJWT], controller.getUsers)
 
