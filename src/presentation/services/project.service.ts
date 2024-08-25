@@ -1,4 +1,4 @@
-import { IProject, ProjectModel } from "../../data/mongodb";
+import { IProject, IUser, ProjectModel } from "../../data/mongodb";
 import { CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, PaginationDto, ProjectEntity, UpdateProjectDto } from "../../domain";
 
 export class ProjectService {
@@ -19,7 +19,7 @@ export class ProjectService {
   }
 
 
-  async getAllProjects(paginationDto: PaginationDto, userId: string) {
+  async getAllProjects(paginationDto: PaginationDto, userId: IUser['_id']) {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
 
