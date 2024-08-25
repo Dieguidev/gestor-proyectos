@@ -145,7 +145,23 @@ export class ProjectService {
     }
   }
 
-  async addMemberById (addTeamMemberDto: AddTeamMemberDto){
+  async addMemberById (addTeamMemberDto: AddTeamMemberDto, project: any) {
+    const { userId } = addTeamMemberDto;
+
+    const user = await UserModel.findById(userId).select('id');
+    if (!user) {
+      throw CustomError.notFound('Usuario no encontrado');
+    }
+
+    if (project.team.includes(user.id)) {
+      throw CustomError.badRequest('Usuario ya se encuentra en el equipo');
+    }
+
+    project.team.push(user.id);
+    await project.save();
+
+
+    return 'Usuario agregado correctamente';
 
   }
 }

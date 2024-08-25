@@ -81,10 +81,11 @@ export class ProjectController {
   }
 
   addMemberById = (req: Request, res: Response) => {
+    const { projectId } = req.params;
     const [error, addTeamMemberDto] = AddTeamMemberDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
-    this.projectService.addMemberById(addTeamMemberDto!)
+    this.projectService.addMemberById(addTeamMemberDto!, req.project!)
       .then(member => res.json(member))
       .catch(error => this.handleError(error, res));
   }

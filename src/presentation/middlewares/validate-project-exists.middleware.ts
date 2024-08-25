@@ -1,7 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import { ProjectModel } from "../../data/mongodb";
+import { IProject, ProjectModel } from "../../data/mongodb";
 import { Validators } from "../../config";
 
+declare global {
+  namespace Express {
+    interface Request {
+      project?: IProject;
+    }
+  }
+}
 
 export class ValidateProjectMiddleware {
 
@@ -14,7 +21,7 @@ export class ValidateProjectMiddleware {
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
     }
-    req.body.project = project;
+    req.project = project;
     next();
   }
 }
