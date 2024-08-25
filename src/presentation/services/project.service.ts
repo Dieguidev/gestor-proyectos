@@ -55,7 +55,7 @@ export class ProjectService {
   }
 
 
-  async getProjectById(getByIdProjectDto: GetByIdProjectDto) {
+  async getProjectById(getByIdProjectDto: GetByIdProjectDto, userId: IUser['_id']) {
     const { id } = getByIdProjectDto;
     try {
       const project = await ProjectModel.findById(id).populate('tasks').exec();
@@ -63,7 +63,9 @@ export class ProjectService {
         throw CustomError.notFound('Project not found');
       }
 
-
+      if (project.manager.toString() !== userId.toString()) {
+        throw CustomError.forbidden('Acción no válida');
+      }
 
 
       return { project: ProjectEntity.fromJson(project) };
