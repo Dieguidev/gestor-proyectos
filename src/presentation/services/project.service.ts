@@ -3,12 +3,6 @@ import { CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, Pag
 
 export class ProjectService {
   async createProject(creaProjectDto: CreateProjectDto) {
-    const { projectName, clientName, description } = creaProjectDto;
-
-    // if(true){
-    //   throw CustomError.badRequest('Invalid data');
-    // }
-
     try {
       const project = new ProjectModel(creaProjectDto);
 

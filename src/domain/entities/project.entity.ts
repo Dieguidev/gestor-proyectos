@@ -9,7 +9,8 @@ export class ProjectEntity {
     public projectName: string,
     public clientName: string,
     public description: string,
-    public tasks: (TaskEntity | mongoose.Types.ObjectId)[] = []
+    public tasks: (TaskEntity | mongoose.Types.ObjectId)[] = [],
+    public manager: mongoose.Types.ObjectId
   ) { }
 
   static fromJson(object: { [key: string]: any }): ProjectEntity {
@@ -18,12 +19,15 @@ export class ProjectEntity {
       projectName,
       clientName,
       description,
-      tasks = [] } = object;
+      tasks = [],
+      manager
+       } = object;
 
     if (!id && !_id) throw CustomError.badRequest('Missing ID');
     if (!projectName) throw CustomError.badRequest('Missing projectName');
     if (!clientName) throw CustomError.badRequest('Missing clientName');
     if (!description) throw CustomError.badRequest('Missing description');
+    if (!manager) throw CustomError.badRequest('Missing manager');
 
     const processedTasks = Array.isArray(tasks) && tasks.length > 0
       ? tasks.map((task: any) => {
@@ -40,7 +44,8 @@ export class ProjectEntity {
       projectName,
       clientName,
       description,
-      processedTasks
+      processedTasks,
+      manager
     );
   }
 }
