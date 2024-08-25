@@ -98,4 +98,10 @@ export class ProjectController {
       .then(member => res.json(member))
       .catch(error => this.handleError(error, res));
   }
+
+  getMembers = (req: Request, res: Response) => {
+    this.projectService.getMembers(req.project!)
+      .then(members => res.json(members))
+      .catch(error => this.handleError(error, res));
+  }
 }

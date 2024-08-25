@@ -2,6 +2,7 @@ import { IProject, IUser, ProjectModel, UserModel } from "../../data/mongodb";
 import { CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, PaginationDto, ProjectEntity, UpdateProjectDto } from "../../domain";
 import { FindMemberByEmailDto } from '../../domain/dtos/team/find-member-by-email.dto';
 import { AddTeamMemberDto } from '../../domain/dtos/team/add-team-member.dto';
+import path from "path";
 
 
 export class ProjectService {
@@ -145,7 +146,7 @@ export class ProjectService {
     }
   }
 
-  async addMemberById (addTeamMemberDto: AddTeamMemberDto, project: any) {
+  async addMemberById(addTeamMemberDto: AddTeamMemberDto, project: any) {
     const { userId } = addTeamMemberDto;
 
     const user = await UserModel.findById(userId).select('id');
@@ -164,7 +165,7 @@ export class ProjectService {
     return 'Usuario agregado correctamente';
 
   }
-  async removeMemberById (addTeamMemberDto: AddTeamMemberDto, project: any) {
+  async removeMemberById(addTeamMemberDto: AddTeamMemberDto, project: any) {
     const { userId } = addTeamMemberDto;
 
     if (!project.team.includes(userId)) {
@@ -174,8 +175,14 @@ export class ProjectService {
     project.team = project.team.filter((id: string) => id.toString() !== userId.toString());
     await project.save();
 
-
     return 'Usuario eliminado correctamente';
+  }
 
+  async getMembers(project: any) {
+    const members = await project.populate({
+      path: 'team',
+      select: 'id name email'
+    });
+    return members.team;
   }
 }
