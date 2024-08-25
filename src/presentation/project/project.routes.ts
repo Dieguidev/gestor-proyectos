@@ -13,8 +13,10 @@ export class ProjectRoutes {
     const projectService = new ProjectService()
     const controller = new ProjectController(projectService);
 
-    router.post('/',[AuthMiddleware.validateJWT], controller.createProject)
-    router.get('/',[AuthMiddleware.validateJWT], controller.getAllProjects)
+    router.use(AuthMiddleware.validateJWT)
+
+    router.post('/', controller.createProject)
+    router.get('/', controller.getAllProjects)
     router.get('/:id', controller.getProjectById)
     router.put('/:id', controller.updateProject)
     router.delete('/:id', controller.deleteProject)
