@@ -1,6 +1,7 @@
 import { IProject, IUser, ProjectModel, UserModel } from "../../data/mongodb";
 import { CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, PaginationDto, ProjectEntity, UpdateProjectDto } from "../../domain";
 import { FindMemberByEmailDto } from '../../domain/dtos/team/find-member-by-email.dto';
+import { AddTeamMemberDto } from '../../domain/dtos/team/add-team-member.dto';
 
 
 export class ProjectService {
@@ -142,5 +143,9 @@ export class ProjectService {
       }
       throw CustomError.internalServer();
     }
+  }
+
+  async addMemberById (addTeamMemberDto: AddTeamMemberDto){
+
   }
 }

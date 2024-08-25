@@ -2,6 +2,8 @@ import { Router } from "express";
 import { ProjectService } from "../services/project.service";
 import { ProjectController } from "./project.controller";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { ValidateProjectMiddleware } from "../middlewares/validate-project-exists.middleware";
+
 
 
 
@@ -23,8 +25,8 @@ export class ProjectRoutes {
 
 
     //*router for team members
-    router.post('/:projectId/team/find', controller.findMemberByEmail)
-    router.post('/:projectId/team', )
+    router.post('/:projectId/team/find', [ValidateProjectMiddleware.validateProjectExists], controller.findMemberByEmail)
+    router.post('/:projectId/team', [ValidateProjectMiddleware.validateProjectExists], controller.addMemberById)
 
     return router;
   }
