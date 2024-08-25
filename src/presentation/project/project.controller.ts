@@ -36,7 +36,7 @@ export class ProjectController {
     const [error, paginationDto] = PaginationDto.create(+page, +limit)
     if (error) return res.status(400).json({ error })
 
-    this.projectService.getAllProjects(paginationDto!)
+    this.projectService.getAllProjects(paginationDto!, req.user!.id)
       .then(projects => res.json(projects))
       .catch(error => this.handleError(error, res));
   }

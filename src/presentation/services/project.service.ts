@@ -19,14 +19,18 @@ export class ProjectService {
   }
 
 
-  async getAllProjects(paginationDto: PaginationDto) {
+  async getAllProjects(paginationDto: PaginationDto, userId: string) {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
 
     try {
       const [total, projects] = await Promise.all([
         ProjectModel.countDocuments(),
-        ProjectModel.find()
+        ProjectModel.find({
+          $or:[
+            {manager:{$in: userId} }
+          ]
+        })
           .skip(skip)
           .limit(limit)
       ])
@@ -51,7 +55,7 @@ export class ProjectService {
   }
 
 
-  async getProjectById(getByIdProjectDto: GetByIdProjectDto){
+  async getProjectById(getByIdProjectDto: GetByIdProjectDto) {
     const { id } = getByIdProjectDto;
     try {
       const project = await ProjectModel.findById(id).populate('tasks').exec();
@@ -62,7 +66,7 @@ export class ProjectService {
 
 
 
-      return {project: ProjectEntity.fromJson(project)};
+      return { project: ProjectEntity.fromJson(project) };
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
@@ -72,7 +76,7 @@ export class ProjectService {
   }
 
   async deleteProject(deleteProjectDto: DeleteProjectDto) {
-    const {id} = deleteProjectDto;
+    const { id } = deleteProjectDto;
     try {
       const project = await ProjectModel.findByIdAndDelete(id);
       if (!project) {
@@ -101,7 +105,7 @@ export class ProjectService {
         throw CustomError.notFound('Project not found');
       }
 
-      return {project: ProjectEntity.fromJson(project)};
+      return { project: ProjectEntity.fromJson(project) };
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
