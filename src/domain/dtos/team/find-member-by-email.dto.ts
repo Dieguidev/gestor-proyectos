@@ -1,12 +1,12 @@
 import { Validators } from "../../../config";
 
 
-export class AddTeamMemberDto {
+export class FindMemberByEmailDto {
   private constructor(
     public email: string
   ) { }
 
-  static create(object: { [key: string]: any }): [string?, AddTeamMemberDto?] {
+  static create(object: { [key: string]: any }): [string?, FindMemberByEmailDto?] {
     const { email } = object;
 
     if (!email) return ['Missing email'];
@@ -14,6 +14,6 @@ export class AddTeamMemberDto {
 
 
 
-    return [undefined, new AddTeamMemberDto(email)]
+    return [undefined, new FindMemberByEmailDto(email)]
   }
 }

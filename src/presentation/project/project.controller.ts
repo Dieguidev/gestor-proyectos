@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
-import { CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, PaginationDto, UpdateProjectDto } from "../../domain";
+import { CreateProjectDto, CustomError, DeleteProjectDto, FindMemberByEmailDto, GetByIdProjectDto, PaginationDto, UpdateProjectDto } from "../../domain";
 import { ProjectService } from "../services/project.service";
-import { AddTeamMemberDto } from '../../domain/dtos/team/add-team-member.dto';
-
 
 
 
@@ -75,9 +73,9 @@ export class ProjectController {
 
 
   findMemberByEmail = (req: Request, res: Response) => {
-    const [error, addTeamMemberDto] = AddTeamMemberDto.create(req.body)
+    const [error, findMemberByEmailDto] = FindMemberByEmailDto.create(req.body)
     if (error) return res.status(400).json({ error })
-    this.projectService.findMemberByEmail(addTeamMemberDto!)
+    this.projectService.findMemberByEmail(findMemberByEmailDto!)
       .then(member => res.json(member))
       .catch(error => this.handleError(error, res));
   }
