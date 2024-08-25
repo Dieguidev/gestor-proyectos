@@ -24,6 +24,7 @@ export class ProjectRoutes {
 
     //*router for team members
     router.post('/:projectId/team/find', controller.findMemberByEmail)
+    router.post('/:projectId/team', )
 
     return router;
   }
