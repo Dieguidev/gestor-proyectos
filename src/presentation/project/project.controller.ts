@@ -22,8 +22,6 @@ export class ProjectController {
 
 
   createProject = (req: Request, res: Response) => {
-    console.log(req.user!.id);
-
     const [error, cerateProjectDto] = CreateProjectDto.create({...req.body, manager: req.user!.id})
     if (error) return res.status(400).json({ error })
 
