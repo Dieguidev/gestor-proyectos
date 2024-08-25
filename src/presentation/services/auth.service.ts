@@ -1,7 +1,7 @@
 import { startSession } from "mongoose";
 import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
-import { UserModel } from "../../data/mongodb/models/user.model";
+import { IUser, UserModel } from "../../data/mongodb/models/user.model";
 
 import { ConfirmTokenDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdatePasswordDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
@@ -433,6 +433,14 @@ export class AuthService {
         throw error;
       }
       throw CustomError.internalServer(`${error}`)
+    }
+  }
+
+  public async user(user: IUser) {
+    const { password: _, ...userEntity } = UserEntity.fromJson(user)
+
+    return {
+      userEntity,
     }
   }
 }
