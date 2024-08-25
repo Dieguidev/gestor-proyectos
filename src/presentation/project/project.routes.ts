@@ -27,6 +27,7 @@ export class ProjectRoutes {
     //*router for team members
     router.post('/:projectId/team/find', [ValidateProjectMiddleware.validateProjectExists], controller.findMemberByEmail)
     router.post('/:projectId/team', [ValidateProjectMiddleware.validateProjectExists], controller.addMemberById)
+    router.delete('/:projectId/team', [ValidateProjectMiddleware.validateProjectExists], controller.removeMemberById)
 
     return router;
   }

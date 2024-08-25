@@ -164,4 +164,18 @@ export class ProjectService {
     return 'Usuario agregado correctamente';
 
   }
+  async removeMemberById (addTeamMemberDto: AddTeamMemberDto, project: any) {
+    const { userId } = addTeamMemberDto;
+
+    if (!project.team.includes(userId)) {
+      throw CustomError.badRequest('Usuario no se encuentra en el proyecto');
+    }
+
+    project.team = project.team.filter((id: string) => id.toString() !== userId.toString());
+    await project.save();
+
+
+    return 'Usuario eliminado correctamente';
+
+  }
 }
