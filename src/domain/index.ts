@@ -38,4 +38,4 @@ export * from './utils/generateSixDigitToken';
 
 export * from './interfaces/email';
 
-;
+export * from './dtos/team/add-team-member.dto';
