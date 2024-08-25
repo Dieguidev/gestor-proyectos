@@ -97,6 +97,7 @@ export class AuthService {
     const token = await this.generateTokenService(user.id)
 
     return {
+      // user: userEntity,
       token
     }
   }
