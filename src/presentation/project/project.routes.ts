@@ -21,6 +21,10 @@ export class ProjectRoutes {
     router.put('/:id', controller.updateProject)
     router.delete('/:id', controller.deleteProject)
 
+
+    //*router for team members
+    router.post('/:projectId/team/find', controller.findMemberByEmail)
+
     return router;
   }
 }

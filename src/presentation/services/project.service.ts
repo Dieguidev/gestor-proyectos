@@ -1,5 +1,6 @@
-import { IProject, IUser, ProjectModel } from "../../data/mongodb";
-import { CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, PaginationDto, ProjectEntity, UpdateProjectDto } from "../../domain";
+import { IProject, IUser, ProjectModel, UserModel } from "../../data/mongodb";
+import { AddTeamMemberDto, CreateProjectDto, CustomError, DeleteProjectDto, GetByIdProjectDto, PaginationDto, ProjectEntity, UpdateProjectDto } from "../../domain";
+
 
 export class ProjectService {
   async createProject(creaProjectDto: CreateProjectDto) {
@@ -27,8 +28,8 @@ export class ProjectService {
       const [total, projects] = await Promise.all([
         ProjectModel.countDocuments(),
         ProjectModel.find({
-          $or:[
-            {manager:{$in: userId} }
+          $or: [
+            { manager: { $in: userId } }
           ]
         })
           .skip(skip)
@@ -116,6 +117,24 @@ export class ProjectService {
       }
 
       return { project: ProjectEntity.fromJson(project) };
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
+
+
+
+  async findMemberByEmail(addTeamMemberDto: AddTeamMemberDto) {
+    const { email } = addTeamMemberDto;
+    try {
+      const user = await UserModel.findOne({ email }).select('id name email');
+      if (!user) {
+        throw CustomError.notFound('Usuario no encontrado');
+      }
+      return user;
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
