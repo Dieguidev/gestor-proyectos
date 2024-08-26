@@ -1,8 +1,8 @@
-import { Document, startSession } from "mongoose";
+import { startSession } from "mongoose";
 
 import { TaskModel, ITask } from '../../data/mongodb/models/task.model';
 import { CreateTaskDto, CustomError, DeleteTaskDto, GetTaskByIdDto, GetTasksByProjectIdDto, ProjectEntity, TaskEntity, UpdateTaskDto } from "../../domain";
-import { IProject } from "../../data/mongodb";
+
 
 
 
@@ -51,16 +51,9 @@ export class TaskService {
     }
   }
 
-  async getTaskById(getTaskByIdDto: GetTaskByIdDto) {
-    const { id, projectId } = getTaskByIdDto;
+  async getTaskById(task: any) {
+
     try {
-      const task = await TaskModel.findById(id);
-      if (!task) {
-        throw CustomError.notFound('Task not found');
-      }
-      if (task.projectId.toString() !== projectId) {
-        throw CustomError.forbidden('You are not allowed to access this task');
-      }
       return TaskEntity.fromJson(task);
     }
     catch (error) {
@@ -72,7 +65,7 @@ export class TaskService {
   }
 
   async updateTask(updateTaskdto: UpdateTaskDto) {
-    const { id, name, description } = updateTaskdto;
+    const { name, description } = updateTaskdto;
     try {
       if (name === undefined && description === undefined) {
         throw CustomError.badRequest('No data to update');
@@ -127,16 +120,20 @@ export class TaskService {
   }
 
 
-  async updateTaskStatus(updateTaskdto: UpdateTaskDto) {
-    const { id, status } = updateTaskdto;
+  async updateTaskStatus(updateTaskdto: UpdateTaskDto, task: any, user: any) {
+    const { status } = updateTaskdto;
     try {
       if (status === undefined) {
         throw CustomError.badRequest('No data to update');
       }
-      const task = await TaskModel.findByIdAndUpdate(id, { status }, { new: true });
-      if (!task) {
-        throw CustomError.notFound('Task not found');
+      task.status = status;
+      if (status === 'pending') {
+        task.completedBy = null;
+      } else {
+        task.completedBy = user.id;
       }
+
+      await task.save();
 
       return TaskEntity.fromJson(task);
     }

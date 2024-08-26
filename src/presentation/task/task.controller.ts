@@ -21,11 +21,11 @@ export class TaskController {
 
   createTask = (req: Request, res: Response) => {
     const { projectId } = req.params;
-    const { name, description, project } = req.body
+    const { name, description } = req.body
     const [error, createTaskDto] = CreateTaskDto.create({ name, description, projectId })
     if (error) return res.status(400).json({ error })
 
-    this.taskService.createTask(createTaskDto!, project)
+    this.taskService.createTask(createTaskDto!, req.project)
       .then((task) => res.json(task))
       .catch((error) => this.handleError(error, res));
   }
@@ -41,13 +41,7 @@ export class TaskController {
   }
 
   getTaskById = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { projectId } = req.params;
-
-    const [error, getTaskByIdDto] = GetTaskByIdDto.create({ id, projectId })
-    if (error) return res.status(400).json({ error })
-
-    this.taskService.getTaskById(getTaskByIdDto!)
+    this.taskService.getTaskById(req.task)
       .then((task) => res.json(task))
       .catch((error) => this.handleError(error, res));
   }
@@ -56,7 +50,7 @@ export class TaskController {
     const { id } = req.params;
     const { name, description } = req.body;
 
-    const [error, updateTaskDto] = UpdateTaskDto.create( {id, name, description })
+    const [error, updateTaskDto] = UpdateTaskDto.create({ id, name, description })
     if (error) return res.status(400).json({ error })
 
     this.taskService.updateTask(updateTaskDto!)
@@ -78,13 +72,10 @@ export class TaskController {
   }
 
   updateTaskStatus = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    const [error, updateTaskDto] = UpdateTaskDto.create( {id, status })
+    const [error, updateTaskDto] = UpdateTaskDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
-    this.taskService.updateTaskStatus(updateTaskDto!)
+    this.taskService.updateTaskStatus(updateTaskDto!, req.task, req.user)
       .then((task) => res.json(task))
       .catch((error) => this.handleError(error, res));
   }
