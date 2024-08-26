@@ -6,6 +6,7 @@ import { CreateTaskDto, CustomError, DeleteTaskDto, GetTaskByIdDto, GetTasksByPr
 
 
 
+
 export class TaskService {
   async createTask(createTaskDto: CreateTaskDto, project: any) {
     const session = await startSession();
@@ -37,12 +38,14 @@ export class TaskService {
   }
 
 
-  async getTasksByProjectId(getTasksByProjectIdDto: GetTasksByProjectIdDto) {
-    const { projectId } = getTasksByProjectIdDto;
-    try {
-      const tasks = await TaskModel.find({ projectId }).populate('projectId');
+  async getTasksByProjectId(project: any) {
 
-      return tasks.map((task: ITask) => TaskEntity.fromJson(task));
+    try {
+      const tasks = await project.populate({
+        path: 'tasks',
+      })
+
+      return tasks.tasks.map((task: any) => TaskEntity.fromJson(task));
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
@@ -64,16 +67,19 @@ export class TaskService {
     }
   }
 
-  async updateTask(updateTaskdto: UpdateTaskDto) {
+  async updateTask(updateTaskdto: UpdateTaskDto, task: any) {
     const { name, description } = updateTaskdto;
     try {
       if (name === undefined && description === undefined) {
         throw CustomError.badRequest('No data to update');
       }
-      const task = await TaskModel.findByIdAndUpdate(id, { name, description }, { new: true });
-      if (!task) {
-        throw CustomError.notFound('Task not found');
+      if (name !== undefined) {
+        task.name = name;
       }
+      if (description !== undefined) {
+        task.description = description;
+      }
+      await task.save();
 
       return TaskEntity.fromJson(task);
     }
@@ -85,24 +91,14 @@ export class TaskService {
     }
   }
 
-  async deleteTask(deleteTaskDto: DeleteTaskDto, project: any) {
+  async deleteTask(project: any, task: any) {
     const session = await startSession();
     session.startTransaction();
-    const { id, projectId } = deleteTaskDto;
     try {
-      const task = await TaskModel.findById(id);
-      if (!task) {
-        throw CustomError.notFound('Task not found');
-      }
-      if (task.projectId.toString() !== projectId) {
-        throw CustomError.forbidden('You are not allowed to access this task');
-      }
-
-      project.tasks = project.tasks.filter((taskId: string) => taskId?.toString() !== id);
+      project.tasks = project.tasks.filter((taskId: string) => taskId?.toString() !== task.id);
 
       await task.deleteOne({ session });
       await project.save({ session });
-
 
       await session.commitTransaction();
       session.endSession();

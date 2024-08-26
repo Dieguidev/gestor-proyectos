@@ -31,11 +31,8 @@ export class TaskController {
   }
 
   getTasksByProjectId = (req: Request, res: Response) => {
-    const { projectId } = req.params;
-    const [error, getTasksByProjectIdDto] = GetTasksByProjectIdDto.create({ projectId })
-    if (error) return res.status(400).json({ error })
 
-    this.taskService.getTasksByProjectId(getTasksByProjectIdDto!)
+    this.taskService.getTasksByProjectId(req.project)
       .then((tasks) => res.json(tasks))
       .catch((error) => this.handleError(error, res));
   }
@@ -47,26 +44,18 @@ export class TaskController {
   }
 
   updateTask = (req: Request, res: Response) => {
-    const { id } = req.params;
     const { name, description } = req.body;
 
-    const [error, updateTaskDto] = UpdateTaskDto.create({ id, name, description })
+    const [error, updateTaskDto] = UpdateTaskDto.create({ name, description })
     if (error) return res.status(400).json({ error })
 
-    this.taskService.updateTask(updateTaskDto!)
+    this.taskService.updateTask(updateTaskDto!, req.task)
       .then((task) => res.json(task))
       .catch((error) => this.handleError(error, res));
   }
 
   deleteTask = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { projectId } = req.params;
-    const { project } = req.body
-
-    const [error, getTaskByIdDto] = GetTaskByIdDto.create({ id, projectId })
-    if (error) return res.status(400).json({ error })
-
-    this.taskService.deleteTask(getTaskByIdDto!, project)
+    this.taskService.deleteTask( req.project, req.task)
       .then(() => res.json({ message: 'Task deleted' }))
       .catch((error) => this.handleError(error, res));
   }

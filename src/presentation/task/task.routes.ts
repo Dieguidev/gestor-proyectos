@@ -3,6 +3,7 @@ import { ValidateProjectMiddleware } from "../middlewares/validate-project-exist
 import { TaskService } from "../services/task.service";
 import { TaskController } from "./task.controller";
 import { ValidateTaskMiddleware } from "../middlewares/validate-task.middleware";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
 
 
 
@@ -12,6 +13,7 @@ export class TaskRoutes {
 
     const taskService = new TaskService();
     const controller = new TaskController(taskService);
+    router.use(AuthMiddleware.validateJWT)
 
     router.param('projectId', ValidateProjectMiddleware.validateProjectExists);
 
