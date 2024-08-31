@@ -32,7 +32,8 @@ export class ProjectService {
         ProjectModel.countDocuments(),
         ProjectModel.find({
           $or: [
-            { manager: { $in: userId } }
+            { manager: { $in: userId } },
+            { team: { $in: userId } }
           ]
         })
           .skip(skip)
@@ -67,10 +68,9 @@ export class ProjectService {
         throw CustomError.notFound('Project not found');
       }
 
-      if (project.manager.toString() !== userId.toString()) {
+      if (project.manager.toString() !== userId.toString() && !project.team.includes(userId)) {
         throw CustomError.forbidden('Acción no válida');
       }
-
 
       return { project: ProjectEntity.fromJson(project) };
     } catch (error) {

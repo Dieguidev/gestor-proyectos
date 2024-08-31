@@ -12,6 +12,4 @@ export class BcryptAdapter {
   static compare(password: string, hashed: string) {
     return compareSync(password, hashed);
   }
-
-
 }
