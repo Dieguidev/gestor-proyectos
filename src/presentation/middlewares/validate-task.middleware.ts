@@ -34,4 +34,12 @@ export class ValidateTaskMiddleware {
     }
     next();
   }
+
+  static async hasAuthorization(req: Request, res: Response, next: NextFunction) {
+    const { project, user } = req;
+    if (user!.id.toString() !== project!.manager.toString()) {
+      throw CustomError.forbidden('Acción no válida');
+    }
+    next();
+  }
 }
