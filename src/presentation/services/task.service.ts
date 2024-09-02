@@ -129,12 +129,13 @@ export class TaskService {
         throw CustomError.badRequest('No data to update');
       }
       task.status = status;
-      if (status === 'pending') {
-        task.completedBy = null;
-      } else {
-        task.completedBy = user.id;
+
+      const data = {
+        user: user.id,
+        status
       }
 
+      task.completedBy.push(data);
       await task.save();
 
       return TaskEntity.fromJson(task);
