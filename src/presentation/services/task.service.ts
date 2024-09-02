@@ -59,7 +59,7 @@ export class TaskService {
     try {
       const taskDetails = await TaskModel.findById(task.id).populate({
         path: 'completedBy',
-        select: 'id name'
+        select: 'id name email'
       });
 
 
