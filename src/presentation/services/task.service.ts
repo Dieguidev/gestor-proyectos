@@ -57,7 +57,13 @@ export class TaskService {
   async getTaskById(task: any) {
 
     try {
-      return TaskEntity.fromJson(task);
+      const taskDetails = await TaskModel.findById(task.id).populate({
+        path: 'completedBy',
+        select: 'id name'
+      });
+
+
+      return TaskEntity.fromJson(taskDetails as any);
     }
     catch (error) {
       if (error instanceof CustomError) {
