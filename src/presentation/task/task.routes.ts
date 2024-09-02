@@ -26,7 +26,7 @@ export class TaskRoutes {
     router.get('/:projectId/task/:taskId', controller.getTaskById);
     router.put('/:projectId/task/:taskId', [ValidateTaskMiddleware.hasAuthorization], controller.updateTask);
     router.delete('/:projectId/task/:taskId', [ValidateTaskMiddleware.hasAuthorization], controller.deleteTask);
-    router.post('/:projectId/task/:taskId/status', [ValidateTaskMiddleware.hasAuthorization], controller.updateTaskStatus);
+    router.post('/:projectId/task/:taskId/status', controller.updateTaskStatus);
 
 
     return router;
