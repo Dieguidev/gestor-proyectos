@@ -40,3 +40,5 @@ export * from './interfaces/email';
 
 export * from './dtos/team/find-member-by-email.dto';
 export * from './dtos/team/add-team-member.dto';
+
+export * from './dtos/notes/create-note.dto';
