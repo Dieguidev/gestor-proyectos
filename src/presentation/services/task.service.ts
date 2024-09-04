@@ -2,6 +2,7 @@ import { startSession } from "mongoose";
 
 import { TaskModel, ITask } from '../../data/mongodb/models/task.model';
 import { CreateTaskDto, CustomError, DeleteTaskDto, GetTaskByIdDto, GetTasksByProjectIdDto, ProjectEntity, TaskEntity, UpdateTaskDto } from "../../domain";
+import path from "path";
 
 
 
@@ -57,10 +58,15 @@ export class TaskService {
   async getTaskById(task: any) {
 
     try {
-      const taskDetails = await TaskModel.findById(task.id).populate({
-        path: 'completedBy.user',
-        select: 'id name email'
-      });
+      const taskDetails = await TaskModel.findById(task.id)
+        .populate({
+          path: 'completedBy.user',
+          select: 'id name email'
+        })
+        .populate({
+          path: 'notes',
+          populate: {path: 'createdBy', select: 'id name email'}
+        });
 
 
       return TaskEntity.fromJson(taskDetails as any);
