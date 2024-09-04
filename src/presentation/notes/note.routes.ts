@@ -17,6 +17,7 @@ export class NoteRoutes {
     router.param('taskId', ValidateTaskMiddleware.taskBelongsToProject);
 
     router.post("/project/:projectId/task/:taskId", controller.createNote);
+    router.get("/project/:projectId/task/:taskId", controller.getNotesByTask);
 
     return router;
   }

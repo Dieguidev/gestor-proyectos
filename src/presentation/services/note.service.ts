@@ -33,4 +33,17 @@ export class NoteService {
       throw CustomError.internalServer();
     }
   }
+
+  async getNotesByTask(task: any) {
+    try {
+      const notes = await NoteModel.find({ task: task.id });
+      return notes;
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+  }
+
 }

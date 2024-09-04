@@ -26,4 +26,10 @@ export class NoteController {
       .then(note => res.json(note))
       .catch(error => this.handleError(error, res));
   }
+
+  getNotesByTask = (req: Request, res: Response) => {
+    this.noteService.getNotesByTask(req.task!)
+      .then(notes => res.json(notes))
+      .catch(error => this.handleError(error, res));
+  }
 }
