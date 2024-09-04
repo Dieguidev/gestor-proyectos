@@ -19,7 +19,7 @@ export interface ITask extends Document {
     user: Types.ObjectId;
     status: TaskStatus;
   }[];
-
+  notes: Types.ObjectId[];
 }
 
 const taskSchema = new Schema({
@@ -55,6 +55,13 @@ const taskSchema = new Schema({
         enum: Object.values(taskStatus),
         default: taskStatus.PENDING
       },
+    }
+  ],
+  notes: [
+    {
+      type: Types.ObjectId,
+      ref: 'Note',
+      default: []
     }
   ]
 }, {

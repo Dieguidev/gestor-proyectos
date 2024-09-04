@@ -22,7 +22,7 @@ export class NoteController {
     const [error, createNoteDto] = CreateNoteDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
-    this.noteService.createNote(createNoteDto!)
+    this.noteService.createNote(createNoteDto!, req.task!, req.user!)
       .then(note => res.json(note))
       .catch(error => this.handleError(error, res));
   }
