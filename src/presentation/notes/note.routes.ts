@@ -18,6 +18,7 @@ export class NoteRoutes {
 
     router.post("/project/:projectId/task/:taskId", controller.createNote);
     router.get("/project/:projectId/task/:taskId", controller.getNotesByTask);
+    router.delete("/:noteId/project/:projectId/task/:taskId", controller.deleteNoteById);
 
     return router;
   }

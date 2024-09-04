@@ -2,6 +2,11 @@ import { Request, Response } from "express";
 import { CreateNoteDto, CustomError } from "../../domain";
 import { NoteService } from "../services/note.service";
 import { INote } from '../../data/mongodb/models/notes.model';
+import { Types } from "mongoose";
+
+export type NoteParams = {
+  noteId: Types.ObjectId
+}
 
 export class NoteController {
   constructor(
@@ -30,6 +35,13 @@ export class NoteController {
   getNotesByTask = (req: Request, res: Response) => {
     this.noteService.getNotesByTask(req.task!)
       .then(notes => res.json(notes))
+      .catch(error => this.handleError(error, res));
+  }
+
+  deleteNoteById = (req: Request<NoteParams>, res: Response) => {
+    const { noteId } = req.params
+    this.noteService.deleteNoteById(noteId, req.user!, req.task!)
+      .then((response) => res.json(response))
       .catch(error => this.handleError(error, res));
   }
 }
