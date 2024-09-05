@@ -437,7 +437,7 @@ export class AuthService {
 
 
   public async updateCurrentUserPassword(UpdateCurrentUserPasswordDto: UpdateCurrentUserPasswordDto, user: any) {
-    const { currentPassword, newPassword } = UpdateCurrentUserPasswordDto;
+    const { currentPassword, password } = UpdateCurrentUserPasswordDto;
 
     try {
       const existsUser = await UserModel.findById(user.id)
@@ -447,7 +447,7 @@ export class AuthService {
         throw CustomError.badRequest('El password actual no coincide')
       }
 
-      existsUser!.password = this.hashPassword(newPassword)
+      existsUser!.password = this.hashPassword(password)
       await existsUser!.save();
 
       return 'Password actualizado correctamente'
