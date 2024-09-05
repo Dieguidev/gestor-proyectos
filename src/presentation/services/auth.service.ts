@@ -103,34 +103,27 @@ export class AuthService {
   }
 
 
-  async update(updateUserDto: UpdateUserDto) {
-    const { id, ...rest } = updateUserDto;
-
+  async update(updateUserDto: UpdateUserDto, user: any) {
+    const { name, email } = updateUserDto;
     try {
-      if (!id || !rest) {
-        throw CustomError.badRequest('Invalid update data');
+
+      const userExist = await UserModel.findOne({ email });
+      if (userExist && userExist.id.toString() !== user.id.toString()) {
+        throw CustomError.badRequest('Ese email ya esta en uso');
       }
 
-      //1. verificar si el correo existe
-      const existsEmail = await UserModel.findOne({ email: rest.email });
-      if (existsEmail) {
-        throw CustomError.badRequest('User already exists');
-      }
+      user.name = name;
+      user.email = email;
+      await user.save();
 
-      if (rest.password) {
-        rest.password = this.hashPassword(rest.password);
-      }
-
-      const user = await UserModel.findByIdAndUpdate(id, rest, { new: true });
-
-      const { password, ...userEntity } = UserEntity.fromJson(user!)
-
-      return { user: userEntity }
+      return 'Perfil actualizado correctamente'
 
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
       }
+      console.log(error);
+
       throw CustomError.internalServer();
     }
   }
@@ -325,34 +318,34 @@ export class AuthService {
   async forgotPassword(requestConfirmationCodeDto: RequestConfirmationCodeDto) {
     const session = await startSession();
 
-  try {
-    await session.withTransaction(async () => {
-      const existUser = await UserModel.findOne({ email: requestConfirmationCodeDto.email }).session(session);
-      if (!existUser) {
-        throw CustomError.badRequest('User not exist');
+    try {
+      await session.withTransaction(async () => {
+        const existUser = await UserModel.findOne({ email: requestConfirmationCodeDto.email }).session(session);
+        if (!existUser) {
+          throw CustomError.badRequest('User not exist');
+        }
+
+        const sixDigittoken = new SixDigitsTokenModel();
+        sixDigittoken.token = generateSixDigitToken();
+        sixDigittoken.user = existUser.id;
+        await sixDigittoken.save({ session });
+
+        const { password, ...userEntity } = UserEntity.fromJson(existUser);
+
+        await this.sendEmaiForgotPassword({ email: existUser.email, name: existUser.name, token: sixDigittoken.token });
+
+        return {
+          user: userEntity,
+        };
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
       }
-
-      const sixDigittoken = new SixDigitsTokenModel();
-      sixDigittoken.token = generateSixDigitToken();
-      sixDigittoken.user = existUser.id;
-      await sixDigittoken.save({ session });
-
-      const { password, ...userEntity } = UserEntity.fromJson(existUser);
-
-      await this.sendEmaiForgotPassword({ email: existUser.email, name: existUser.name, token: sixDigittoken.token });
-
-      return {
-        user: userEntity,
-      };
-    });
-  } catch (error) {
-    if (error instanceof CustomError) {
-      throw error;
+      throw CustomError.internalServer(`${error}`);
+    } finally {
+      session.endSession();
     }
-    throw CustomError.internalServer(`${error}`);
-  } finally {
-    session.endSession();
-  }
   }
 
   private async sendEmaiForgotPassword(user: IEmail) {
@@ -441,4 +434,5 @@ export class AuthService {
       user,
     }
   }
+
 }

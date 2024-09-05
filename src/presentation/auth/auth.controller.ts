@@ -48,9 +48,7 @@ export class AuthController {
     const [error, updateUserDto] = UpdateUserDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
-    console.log(updateUserDto);
-
-    this.authService.update(updateUserDto!)
+    this.authService.update(updateUserDto!, req.user!)
       .then((user) => res.json(user))
       .catch((error) => this.handleError(error, res));
   }
