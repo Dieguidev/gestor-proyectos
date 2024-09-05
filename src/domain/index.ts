@@ -44,3 +44,4 @@ export * from './dtos/team/add-team-member.dto';
 export * from './dtos/notes/create-note.dto';
 
 export * from './dtos/auth/update-current-user-password.dto';
+export * from './dtos/auth/check-password.dto';

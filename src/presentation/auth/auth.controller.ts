@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { ConfirmTokenDto, CustomError, ForgotPasswordDto, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateCurrentUserPasswordDto, UpdatePasswordDto, UpdateUserDto } from "../../domain"
+import { CheckPasswordDto, ConfirmTokenDto, CustomError, ForgotPasswordDto, GetAndDeleteUserDto, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateCurrentUserPasswordDto, UpdatePasswordDto, UpdateUserDto } from "../../domain"
 
 import { AuthService } from "../services/auth.service";
 
@@ -116,12 +116,21 @@ export class AuthController {
       .catch((error) => this.handleError(error, res));
   }
 
-  updateCurrentUserPassword= (req: Request, res: Response) => {
+  updateCurrentUserPassword = (req: Request, res: Response) => {
     const [error, updateCurrentUserPasswordDto] = UpdateCurrentUserPasswordDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
     this.authService.updateCurrentUserPassword(updateCurrentUserPasswordDto!, req.user!)
       .then((user) => res.json(user))
+      .catch((error) => this.handleError(error, res));
+  }
+
+  checkPassword = (req: Request, res: Response) => {
+    const [error, checkPasswordDto] = CheckPasswordDto.create(req.body)
+    if (error) return res.status(400).json({ error })
+
+    this.authService.checkPassword(checkPasswordDto!, req.user!)
+      .then((rpta) => res.json(rpta))
       .catch((error) => this.handleError(error, res));
   }
 

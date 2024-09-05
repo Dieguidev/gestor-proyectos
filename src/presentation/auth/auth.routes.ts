@@ -30,7 +30,7 @@ export class AuthRoutes {
 
     router.post('/login', controller.loginUser)
     router.post('/register', controller.registerUser)
-    router.delete('/:id',[AuthMiddleware.isAdminRoleOrSameUser], controller.deleteUser)
+    router.delete('/:id', [AuthMiddleware.isAdminRoleOrSameUser], controller.deleteUser)
     router.post('/confirm-account', controller.confirmAccount)
     router.post('/request-confirmation-code', controller.requestConfirmationCode)
     router.post('/forgot-password', controller.forgotPassword)
@@ -41,6 +41,7 @@ export class AuthRoutes {
 
     router.put('/profile', [AuthMiddleware.validateJWT], controller.updateUser)
     router.post('/update-password', [AuthMiddleware.validateJWT], controller.updateCurrentUserPassword)
+    router.post('/check-password', [AuthMiddleware.validateJWT], controller.checkPassword)
 
     // router.get('/', [AuthMiddleware.validateJWT], controller.getUsers)
 
