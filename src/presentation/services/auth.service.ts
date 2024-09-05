@@ -3,7 +3,7 @@ import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
 import { IUser, UserModel } from "../../data/mongodb/models/user.model";
 
-import { ConfirmTokenDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdatePasswordDto, UpdateUserDto, UserEntity } from "../../domain";
+import { ConfirmTokenDto, CustomError, generateSixDigitToken, GetAndDeleteUserDto, IEmail, LoginUserDto, RegisterUserDto, RequestConfirmationCodeDto, UpdateCurrentUserPasswordDto, UpdatePasswordDto, UpdateUserDto, UserEntity } from "../../domain";
 import { EmailService } from "./email.service";
 
 
@@ -433,6 +433,31 @@ export class AuthService {
     return {
       user,
     }
+  }
+
+
+  public async updateCurrentUserPassword(UpdateCurrentUserPasswordDto: UpdateCurrentUserPasswordDto, user: any) {
+    const { currentPassword, newPassword } = UpdateCurrentUserPasswordDto;
+
+    try {
+      const existsUser = await UserModel.findById(user.id)
+
+      const isMatchPassword = this.comparePassword(currentPassword, existsUser!.password)
+      if (!isMatchPassword) {
+        throw CustomError.badRequest('El password actual no coincide')
+      }
+
+      existsUser!.password = this.hashPassword(newPassword)
+      await existsUser!.save();
+
+      return 'Password actualizado correctamente'
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer();
+    }
+
   }
 
 }

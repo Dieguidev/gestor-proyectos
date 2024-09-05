@@ -40,6 +40,7 @@ export class AuthRoutes {
 
 
     router.put('/profile', [AuthMiddleware.validateJWT], controller.updateUser)
+    router.post('/update-password', [AuthMiddleware.validateJWT], controller.updateCurrentUserPassword)
 
     // router.get('/', [AuthMiddleware.validateJWT], controller.getUsers)
 
