@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
+import { NoteModel } from "./notes.model";
 
 const taskStatus = {
   PENDING: 'pending',
@@ -67,5 +68,12 @@ const taskSchema = new Schema({
 }, {
   timestamps: true
 })
+
+taskSchema.pre('deleteOne', { document: true, query: false }, async function () {
+  const taskId = this._id;
+  if (!taskId) return
+  await NoteModel.deleteMany({ task: taskId });
+});
+
 
 export const TaskModel = mongoose.model<ITask>('Task', taskSchema, 'tasks');
