@@ -30,16 +30,17 @@ export class ValidateTaskMiddleware {
   static async taskBelongsToProject(req: Request, res: Response, next: NextFunction) {
     const { task, project } = req;
     if (task!.projectId.toString() !== project!.id.toString()) {
-      throw CustomError.forbidden('You are not allowed to access this task');
+      return res.status(403).json({ error: 'You are not allowed to access this task' });
     }
     next();
   }
 
   static async hasAuthorization(req: Request, res: Response, next: NextFunction) {
-    const { project, user } = req;
-    if (user!.id.toString() !== project!.manager.toString()) {
-      throw CustomError.forbidden('Acción no válida');
-    }
-    next();
+      const { project, user } = req;
+      if (user!.id.toString() !== project!.manager.toString()) {
+        return res.status(403).json({ error: 'Acción no válida' });
+      }
+      next();
+
   }
 }

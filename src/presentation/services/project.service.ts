@@ -81,43 +81,30 @@ export class ProjectService {
     }
   }
 
-  async deleteProject(deleteProjectDto: DeleteProjectDto, userId: IUser['_id']) {
-    const { id } = deleteProjectDto;
+  async deleteProject(project: any) {
     try {
-      const project = await ProjectModel.findByIdAndDelete(id);
-      if (!project) {
-        throw CustomError.notFound('Project not found');
-      }
+      console.log(project);
 
-      if (project.manager.toString() !== userId.toString()) {
-        throw CustomError.forbidden('Acción no válida');
-      }
-
+      await ProjectModel.findByIdAndDelete(project.id);
       return 'Project deleted';
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
       }
+      console.log(`${error}`);
+
       throw CustomError.internalServer();
     }
   }
 
 
-  async updateProject(updateProjectDto: UpdateProjectDto, userId: IUser['_id']) {
-    const { id, ...rest } = updateProjectDto
+  async updateProject(updateProjectDto: UpdateProjectDto, project: any) {
+    const { clientName, description, projectName } = updateProjectDto
     try {
-      if (!id || !rest) {
-        throw CustomError.badRequest('Invalid update data');
-      }
-      const project = await ProjectModel.findByIdAndUpdate(id, rest, { new: true });
-
-      if (!project) {
-        throw CustomError.notFound('Project not found');
-      }
-
-      if (project.manager.toString() !== userId.toString()) {
-        throw CustomError.forbidden('Acción no válida');
-      }
+      project.clientName = clientName;
+      project.description = description;
+      project.projectName = projectName;
+      await project.save();
 
       return { project: ProjectEntity.fromJson(project) };
     } catch (error) {

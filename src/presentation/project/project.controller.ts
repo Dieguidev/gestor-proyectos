@@ -21,7 +21,7 @@ export class ProjectController {
 
 
   createProject = (req: Request, res: Response) => {
-    const [error, cerateProjectDto] = CreateProjectDto.create({...req.body, manager: req.user!.id})
+    const [error, cerateProjectDto] = CreateProjectDto.create({ ...req.body, manager: req.user!.id })
     if (error) return res.status(400).json({ error })
 
     this.projectService.createProject(cerateProjectDto!)
@@ -52,21 +52,16 @@ export class ProjectController {
   }
 
   updateProject = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const [error, updateProjectDto] = UpdateProjectDto.create({id, ...req.body})
+    const [error, updateProjectDto] = UpdateProjectDto.create(req.body)
     if (error) return res.status(400).json({ error })
 
-    this.projectService.updateProject(updateProjectDto!, req.user!.id)
+    this.projectService.updateProject(updateProjectDto!, req.project!)
       .then(project => res.json(project))
       .catch(error => this.handleError(error, res));
   }
 
   deleteProject = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const [error, deleteProjectDto] = DeleteProjectDto.create({ id })
-    if (error) return res.status(400).json({ error })
-
-    this.projectService.deleteProject(deleteProjectDto!, req.user!.id)
+    this.projectService.deleteProject(req.project!)
       .then(rpta => res.json(rpta))
       .catch(error => this.handleError(error, res));
   }
@@ -91,8 +86,8 @@ export class ProjectController {
 
 
   removeMemberById = (req: Request, res: Response) => {
-    const {userId} = req.params;
-    const [error, addTeamMemberDto] = AddTeamMemberDto.create({userId})
+    const { userId } = req.params;
+    const [error, addTeamMemberDto] = AddTeamMemberDto.create({ userId })
     if (error) return res.status(400).json({ error })
 
     this.projectService.removeMemberById(addTeamMemberDto!, req.project!)

@@ -3,6 +3,7 @@ import { ProjectService } from "../services/project.service";
 import { ProjectController } from "./project.controller";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { ValidateProjectMiddleware } from "../middlewares/validate-project-exists.middleware";
+import { ValidateTaskMiddleware } from "../middlewares/validate-task.middleware";
 
 
 
@@ -16,19 +17,20 @@ export class ProjectRoutes {
     const controller = new ProjectController(projectService);
 
     router.use(AuthMiddleware.validateJWT)
+    router.param('projectId', ValidateProjectMiddleware.validateProjectExists);
 
     router.post('/', controller.createProject)
     router.get('/', controller.getAllProjects)
     router.get('/:id', controller.getProjectById)
-    router.put('/:id', controller.updateProject)
-    router.delete('/:id', controller.deleteProject)
+    router.put('/:projectId', [ValidateTaskMiddleware.hasAuthorization], controller.updateProject)
+    router.delete('/:projectId', [ValidateTaskMiddleware.hasAuthorization], controller.deleteProject)
 
 
     //*router for team members
-    router.post('/:projectId/team/find', [ValidateProjectMiddleware.validateProjectExists], controller.findMemberByEmail)
-    router.post('/:projectId/team', [ValidateProjectMiddleware.validateProjectExists], controller.addMemberById)
-    router.delete('/:projectId/team/:userId', [ValidateProjectMiddleware.validateProjectExists], controller.removeMemberById)
-    router.get('/:projectId/team', [ValidateProjectMiddleware.validateProjectExists], controller.getMembers)
+    router.post('/:projectId/team/find', controller.findMemberByEmail)
+    router.post('/:projectId/team', controller.addMemberById)
+    router.delete('/:projectId/team/:userId', controller.removeMemberById)
+    router.get('/:projectId/team', controller.getMembers)
 
     return router;
   }
