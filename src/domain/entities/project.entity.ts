@@ -10,7 +10,8 @@ export class ProjectEntity {
     public clientName: string,
     public description: string,
     public tasks: (TaskEntity | mongoose.Types.ObjectId)[] = [],
-    public manager: mongoose.Types.ObjectId
+    public manager: mongoose.Types.ObjectId,
+    public team: mongoose.Types.ObjectId[] = [],
   ) { }
 
   static fromJson(object: { [key: string]: any }): ProjectEntity {
@@ -20,7 +21,8 @@ export class ProjectEntity {
       clientName,
       description,
       tasks = [],
-      manager
+      manager,
+      team
        } = object;
 
     if (!id && !_id) throw CustomError.badRequest('Missing ID');
@@ -28,6 +30,7 @@ export class ProjectEntity {
     if (!clientName) throw CustomError.badRequest('Missing clientName');
     if (!description) throw CustomError.badRequest('Missing description');
     if (!manager) throw CustomError.badRequest('Missing manager');
+    if (!team) throw CustomError.badRequest('Missing team');
 
     const processedTasks = Array.isArray(tasks) && tasks.length > 0
       ? tasks.map((task: any) => {
@@ -45,7 +48,8 @@ export class ProjectEntity {
       clientName,
       description,
       processedTasks,
-      manager
+      manager,
+      team
     );
   }
 }
