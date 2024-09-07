@@ -1,6 +1,7 @@
 import mongoose, { PopulatedDoc, Schema } from "mongoose";
-import { ITask } from "./task.model";
+import { ITask, TaskModel } from "./task.model";
 import { IUser } from "./user.model";
+import { NoteModel } from "./notes.model";
 
 export interface IProject extends Document {
   projectName: string;
@@ -27,7 +28,7 @@ const projectSchema = new Schema({
     type: String,
     required: [true, 'Description is required'],
   },
-  tasks:[
+  tasks: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Task'
@@ -46,6 +47,17 @@ const projectSchema = new Schema({
   ]
 }, {
   timestamps: true
+});
+
+projectSchema.pre('deleteOne', { document: true, query: false }, async function () {
+  const projectId = this._id;
+  if (!projectId) return
+  const tasks = await TaskModel.find({ projectId });
+
+  for (const task of tasks) {
+    await NoteModel.deleteMany({ task: task._id });
+  }
+  await TaskModel.deleteMany({ projectId });
 });
 
 export const ProjectModel = mongoose.model<IProject>('Project', projectSchema, 'projects');

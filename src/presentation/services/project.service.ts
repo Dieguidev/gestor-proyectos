@@ -83,9 +83,7 @@ export class ProjectService {
 
   async deleteProject(project: any) {
     try {
-      console.log(project);
-
-      await ProjectModel.findByIdAndDelete(project.id);
+      await project.deleteOne();
       return 'Project deleted';
     } catch (error) {
       if (error instanceof CustomError) {
