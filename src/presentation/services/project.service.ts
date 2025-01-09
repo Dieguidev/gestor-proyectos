@@ -68,7 +68,14 @@ export class ProjectService {
         throw CustomError.notFound('Project not found');
       }
 
-      if (project.manager.toString() !== userId.toString() && !project.team.includes(userId)) {
+      console.log(project.manager!, userId);
+      console.log(project.team);
+
+      const projectTeamstoString = project.team.map((id: any) => id.toString());
+
+
+
+      if (project.manager!.toString() !== userId && !projectTeamstoString.includes(userId)) {
         throw CustomError.forbidden('Acción no válida');
       }
 
