@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import { startSession } from "mongoose";
 import { BcryptAdapter, envs, JwtAdapter } from "../../config";
 import { SixDigitsTokenModel } from "../../data/mongodb/models/sixDigitsToken";
@@ -35,6 +38,7 @@ export class AuthService {
 
       //encriptar contraseña
       user.password = this.hashPassword(registerUserDto.password)
+      user.confirmed = true
       await user.save({ session });
 
       const sixDigittoken = new SixDigitsTokenModel()
@@ -176,9 +180,24 @@ export class AuthService {
       html,
     }
 
-    const isSent = await this.emailservice.sendEmail(options);
-    if (!isSent) {
-      throw CustomError.internalServer('Error sending email')
+    // const isSent = await this.emailservice.sendEmail(options);
+    // if (!isSent) {
+    //   throw CustomError.internalServer('Error sending email')
+    // }
+
+    try {
+      const isSent = await this.emailservice.sendEmail(options);
+      if (!isSent) {
+        throw new Error('Error sending email');
+      }
+    } catch (error: any) {
+      // Guardar el error en un archivo
+      console.log(error);
+
+      const logFilePath = path.join(__dirname, 'error.log');
+      const logMessage = `Error al enviar correo a ${user.email}\nError: ${error.message}\n\n`;
+      fs.appendFileSync(logFilePath, logMessage);
+      throw CustomError.internalServer('Error sending email 1');
     }
   }
 
@@ -202,9 +221,22 @@ export class AuthService {
       html,
     }
 
-    const isSent = await this.emailservice.sendEmail(options);
-    if (!isSent) {
-      throw CustomError.internalServer('Error sending email')
+    // const isSent = await this.emailservice.sendEmail(options);
+    // if (!isSent) {
+    //   throw CustomError.internalServer('Error sending email')
+    // }
+
+    try {
+      const isSent = await this.emailservice.sendEmail(options);
+      if (!isSent) {
+        throw new Error('Error sending email');
+      }
+    } catch (error: any) {
+      // Guardar el error en un archivo
+      const logFilePath = path.join(__dirname, 'error.log');
+      const logMessage = `Error al enviar correo a \nError: ${error.message}\n\n`;
+      fs.appendFileSync(logFilePath, logMessage);
+      throw CustomError.internalServer('Error sending email 2');
     }
 
     return true;
@@ -364,9 +396,22 @@ export class AuthService {
       html,
     }
 
-    const isSent = await this.emailservice.sendEmail(options);
-    if (!isSent) {
-      throw CustomError.internalServer('Error sending email')
+    // const isSent = await this.emailservice.sendEmail(options);
+    // if (!isSent) {
+    //   throw CustomError.internalServer('Error sending email')
+    // }
+
+    try {
+      const isSent = await this.emailservice.sendEmail(options);
+      if (!isSent) {
+        throw new Error('Error sending email');
+      }
+    } catch (error: any) {
+      // Guardar el error en un archivo
+      const logFilePath = path.join(__dirname, 'error.log');
+      const logMessage = `Error al enviar correo a ${user.email}\nError: ${error.message}\n\n`;
+      fs.appendFileSync(logFilePath, logMessage);
+      throw CustomError.internalServer('Error sending email');
     }
   }
 
